@@ -66,7 +66,7 @@ function johanbissemattsson_setup() {
 	 * See http://codex.wordpress.org/Post_Formats
 	 */
 	add_theme_support( 'post-formats', array(
-		'image', 'video', 'quote', 'link',
+		'status',
 	) );
 
 	// Set up the WordPress core custom background feature.
@@ -93,6 +93,11 @@ function johanbissemattsson_scripts() {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'johanbissemattsson_scripts' );
+
+if( function_exists('acf_add_options_page') ) {	
+	acf_add_options_page();
+	acf_set_options_page_title( __('Header & Footer') );	
+}
 
 /**
  * Implement the Custom Header feature.
