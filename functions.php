@@ -66,7 +66,7 @@ function johanbissemattsson_setup() {
 	 * See http://codex.wordpress.org/Post_Formats
 	 */
 	add_theme_support( 'post-formats', array(
-		'aside', 'image', 'video', 'quote', 'link',
+		'image', 'video', 'quote', 'link',
 	) );
 
 	// Set up the WordPress core custom background feature.
@@ -172,4 +172,4 @@ function df_disable_comments_admin_bar() {
 		remove_action('admin_bar_menu', 'wp_admin_bar_comments_menu', 60);
 	}
 }
-add_action('init', 'df_disable_comments_admin_bar');
+add_action('add_admin_bar_menus', 'df_disable_comments_admin_bar');
