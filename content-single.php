@@ -8,9 +8,12 @@
 	<header class="entry-header">
 		<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
 
-		<div class="entry-meta">
-			<?php johanbissemattsson_posted_on(); ?>
-		</div><!-- .entry-meta -->
+	 	<?php if ( has_post_format(status) ): ?>			
+			<div class="entry-meta">
+				<?php johanbissemattsson_posted_on(); ?>
+			</div><!-- .entry-meta -->
+		<?php endif; ?>
+
 	</header><!-- .entry-header -->
 
 	<div class="entry-content">
