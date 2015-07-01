@@ -7,7 +7,7 @@ app.directive('contentview', ['$templateCache', function($templateCache)
         restrict: 'A',
         compile:  function (element)
         {
-            $templateCache.put('hej.html', element.html());
+            $templateCache.put('initialcontent.html', element.html());
         }
     };
 }])
@@ -31,11 +31,11 @@ app.config(function($routeProvider, $locationProvider) {
         templateUrl: function(){
             if(initialized){ 
                 return 'content.html';
+
+            } else {
+                initialized = true;
+                return 'initialcontent.html';
             }
-
-            initialized = true;
-
-            return 'hej.html';
         },
         controller: 'Content'
     });
