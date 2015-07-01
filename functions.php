@@ -46,7 +46,7 @@ function johanbissemattsson_setup() {
 	 *
 	 * @link http://codex.wordpress.org/Function_Reference/add_theme_support#Post_Thumbnails
 	 */
-	//add_theme_support( 'post-thumbnails' );
+	add_theme_support( 'post-thumbnails' );
 
 	// This theme uses wp_nav_menu() in one location.
 	register_nav_menus( array(
@@ -87,6 +87,18 @@ function johanbissemattsson_scripts() {
 	wp_enqueue_script( 'johanbissemattsson-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20120206', true );
 
 	wp_enqueue_script( 'johanbissemattsson-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20130115', true );
+
+	wp_enqueue_script( 'johanbissemattsson-scripts', get_template_directory_uri() . '/js/main-dist.js', array( 'isotope', 'angularjs', 'angularjs-route', 'angularjs-sanitize' ),'1.0', true );		
+	
+	wp_enqueue_script( 'isotope', '//cdnjs.cloudflare.com/ajax/libs/jquery.isotope/2.2.0/isotope.pkgd.min.js', array(),'2.2.0', true );
+
+	wp_register_script( 'angularjs', get_template_directory_uri() . '/js/vendor/angular.js');
+
+	wp_register_script( 'angularjs-route', get_template_directory_uri() . '/js/vendor/angular-route.js');
+
+	wp_register_script( 'angularjs-sanitize', '//ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular-sanitize.js');
+
+	wp_localize_script('johanbissemattsson-scripts','myLocalized', array( 'partials' => trailingslashit( get_template_directory_uri() ) . 'partials/' ) );	
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
@@ -178,3 +190,17 @@ function df_disable_comments_admin_bar() {
 	}
 }
 add_action('add_admin_bar_menus', 'df_disable_comments_admin_bar');
+
+add_filter('json_prepare_post', 'json_api_encode_acf');
+
+function json_api_encode_acf($post) {
+    
+    $acf = get_fields($post['ID']);
+    
+    if (isset($post)) {
+      $post['acf'] = $acf;
+    }
+
+    return $post;
+
+}

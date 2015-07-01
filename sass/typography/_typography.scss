@@ -5,8 +5,10 @@ select,
 textarea {
 	color: $color__text-main;
 	font-family: $font__main;
-	@include font-size(1.5);
+	@include font-size(1.375);
 	line-height: $font__line-height-body;
+	-webkit-font-smoothing: antialiased;
+	font-weight: 300;
 }
 
 @import "headings";

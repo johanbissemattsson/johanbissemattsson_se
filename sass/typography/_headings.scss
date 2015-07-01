@@ -5,3 +5,29 @@ h1, h2, h3, h4, h5, h6 {
 		text-decoration: none;
 	}
 }
+
+h1, .entry-details {
+	text-align: center;
+}
+
+.site-title {
+	text-align: left;
+}
+
+.entry-header {
+	a {
+		text-decoration: none;
+		display: block;
+	}
+}
+
+.grid-item {
+	h1 {
+		font-size: $font__size-grid-item-h1;
+		margin: 0;
+	}
+
+	.entry-details {
+		font-size: $font__size-grid-item-entry-details;
+	}
+}

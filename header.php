@@ -7,8 +7,9 @@
  * @package johanbissemattsson
  */
 ?><!DOCTYPE html>
-<html <?php language_attributes(); ?>>
+<html <?php language_attributes(); ?> ng-app="app">
 <head>
+<base href="/johanbissemattsson/">
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="profile" href="http://gmpg.org/xfn/11">
@@ -21,16 +22,18 @@
 <div id="page" class="hfeed site">
 	<a class="skip-link screen-reader-text" href="#content"><?php _e( 'Skip to content', 'johanbissemattsson' ); ?></a>
 
+	<?php if ( is_front_page() ) { ?>
 	<header id="masthead" class="site-header" role="banner">
+	<?php } else { ?>
+	<header id="masthead" class="site-header minified" role="banner">
+	<?php } ?>
 		<div class="site-branding">
 			<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
 			<div class="site-description">
 				<p><?php the_field('headerfooter_content', 'option'); ?></p>
 			</div>
 		</div><!-- .site-branding -->
-
-		<nav id="site-navigation" class="main-navigation" role="navigation">
-		</nav><!-- #site-navigation -->
 	</header><!-- #masthead -->
 
 	<div id="content" class="site-content">
+	<?php if ( is_front_page() ) { ?><div contentview ng-view autoscroll="true"></div> <?php } ?>
