@@ -15,6 +15,7 @@ get_header(); ?>
 
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
+			<div contentview ng-view autoscroll="true"></div>
 			<div class="grid js-isotope" data-isotope-options='{ "percentPosition": "true", "itemSelector": ".grid-item", "layoutMode": "masonry", "transitionDuration": "0", "masonry": { "columnWidth": ".grid-sizer", "gutter": ".gutter-sizer" } }'>
 				<div class="grid-sizer"></div>
 				<div class="gutter-sizer"></div>

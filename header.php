@@ -36,4 +36,3 @@
 	</header><!-- #masthead -->
 
 	<div id="content" class="site-content">
-	<?php if ( is_front_page() ) { ?><div contentview ng-view autoscroll="true"></div> <?php } ?>
