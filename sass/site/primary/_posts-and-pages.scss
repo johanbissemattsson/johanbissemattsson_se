@@ -71,3 +71,38 @@
 			padding-left: 3em;
 		}
 }
+
+.site-description {
+	margin-top: 124vh;
+}
+
+.homepage-description {
+	margin-top: 24vh;
+}
+
+.slideup {
+    height: 100%;
+}
+.slideup.ng-enter {
+    -webkit-transition: all 1s  ease;
+    transition: all 1s ease;
+}
+
+.slideup.ng-leave {
+    -webkit-transition: all 0s  cubic-bezier(0.215, 0.61, 0.355, 1);
+    transition: all 0s  cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+.slideup.ng-enter {
+    transform: translate(0,0);
+    opacity: 0;
+}
+.slideup.ng-enter-active {
+    opacity: 1;
+    transform: translate(1,1);
+}
+.slideup.ng-leave {
+    opacity: 1;
+}
+.slideup.ng-leave-active {
+    opacity: 0;
+}

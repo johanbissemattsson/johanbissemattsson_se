@@ -21,11 +21,6 @@
 						</div>
 					<?php endif; ?>
 
-			 		<?php if ( has_post_format(status) ): ?>			
-						<div class="entry-meta">
-							<?php johanbissemattsson_posted_on(); ?>
-						</div><!-- .entry-meta -->
-					<?php endif; ?>
 				<?php endif; ?>
 
 			</a>

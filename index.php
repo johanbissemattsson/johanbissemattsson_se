@@ -15,7 +15,15 @@ get_header(); ?>
 
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
-			<div contentview ng-view autoscroll="true"></div>
+			<div contentview ng-view autoscroll="false" class="slideup">
+				<div class="site-description homepage-description">
+					<?php
+						$homepage = get_page_by_title('Home'); 
+						$homepagecontent = apply_filters('the_content', $homepage->post_content);
+						echo $homepagecontent;
+					?>
+				</div>			
+			</div>
 			<div class="grid js-isotope" data-isotope-options='{ "percentPosition": "true", "itemSelector": ".grid-item", "layoutMode": "masonry", "transitionDuration": "0", "masonry": { "columnWidth": ".grid-sizer", "gutter": ".gutter-sizer" } }'>
 				<div class="grid-sizer"></div>
 				<div class="gutter-sizer"></div>

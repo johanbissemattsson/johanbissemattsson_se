@@ -16,6 +16,7 @@
 <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
 
 <?php wp_head(); ?>
+
 </head>
 
 <body <?php body_class(); ?>>
@@ -29,9 +30,6 @@
 	<?php } ?>
 		<div class="site-branding">
 			<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
-			<div class="site-description">
-				<p><?php the_field('headerfooter_content', 'option'); ?></p>
-			</div>
 		</div><!-- .site-branding -->
 	</header><!-- #masthead -->
 

@@ -84,11 +84,11 @@ add_action( 'after_setup_theme', 'johanbissemattsson_setup' );
 function johanbissemattsson_scripts() {
 	wp_enqueue_style( 'johanbissemattsson-style', get_stylesheet_uri() );
 
-	wp_enqueue_script( 'johanbissemattsson-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20120206', true );
+	//wp_enqueue_script( 'johanbissemattsson-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20120206', true );
 
 	wp_enqueue_script( 'johanbissemattsson-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20130115', true );
 
-	wp_enqueue_script( 'johanbissemattsson-scripts', get_template_directory_uri() . '/js/main-dist.js', array( 'isotope', 'angularjs', 'angularjs-route', 'angularjs-sanitize' ),'1.0', true );		
+	wp_enqueue_script( 'johanbissemattsson-scripts', get_template_directory_uri() . '/js/main-dist.js', array( 'isotope', 'angularjs', 'angularjs-route', 'angularjs-sanitize', 'angularjs-animate'),'1.0', true );		
 	
 	wp_enqueue_script( 'isotope', '//cdnjs.cloudflare.com/ajax/libs/jquery.isotope/2.2.0/isotope.pkgd.min.js', array(),'2.2.0', true );
 
@@ -97,6 +97,8 @@ function johanbissemattsson_scripts() {
 	wp_register_script( 'angularjs-route', get_template_directory_uri() . '/js/vendor/angular-route.js');
 
 	wp_register_script( 'angularjs-sanitize', '//ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular-sanitize.js');
+
+	wp_register_script( 'angularjs-animate', '//ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular-animate.js');
 
 	wp_localize_script('johanbissemattsson-scripts','myLocalized', array( 'partials' => trailingslashit( get_template_directory_uri() ) . 'partials/' ) );	
 
@@ -191,6 +193,8 @@ function df_disable_comments_admin_bar() {
 }
 add_action('add_admin_bar_menus', 'df_disable_comments_admin_bar');
 
+// Add Advanced Custom Fields to JSON
+
 add_filter('json_prepare_post', 'json_api_encode_acf');
 
 function json_api_encode_acf($post) {
@@ -204,3 +208,30 @@ function json_api_encode_acf($post) {
     return $post;
 
 }
+
+// Build JSON cache file
+
+function build_json_file() {
+	
+	$posts = wp_remote_retrieve_body( wp_remote_get( get_site_url() . '/wp-json/posts/', array( 'timeout' => 120) ));
+	$pages = wp_remote_retrieve_body( wp_remote_get( get_site_url() . '/wp-json/pages/', array( 'timeout' => 120) ));
+
+	$postsarray = json_decode( $posts, true );
+	$pagesarray = json_decode( $pages, true );
+	$postsandpagesarray = array_merge_recursive( $postsarray, $pagesarray );
+	$postsandpages = json_encode( $postsandpagesarray );
+
+	$upload_dir = wp_upload_dir();    
+	$path = $upload_dir['basedir'] . '/json/';
+	$file = trailingslashit($path) . 'sitedata.json';
+	
+	if ( ! file_exists($path) ) {
+		mkdir($path, 0755);
+	}
+	
+	file_put_contents($file, $postsandpages);
+
+}
+
+add_action('save_post', 'build_json_file' );
+add_action('delete_post', 'build_json_file' );
