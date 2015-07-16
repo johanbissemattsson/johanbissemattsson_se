@@ -7,7 +7,7 @@
  * @package johanbissemattsson
  */
 ?><!DOCTYPE html>
-<html <?php language_attributes(); ?> ng-app="app">
+<html <?php language_attributes(); ?> ng-app="app" ng-controller="MainController">
 <head>
 <base href="/johanbissemattsson/">
 <meta charset="<?php bloginfo( 'charset' ); ?>">
@@ -16,7 +16,6 @@
 <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
 
 <?php wp_head(); ?>
-
 </head>
 
 <body <?php body_class(); ?>>

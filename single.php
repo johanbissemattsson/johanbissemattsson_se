@@ -9,7 +9,7 @@ get_header(); ?>
 
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
-			<div contentview ng-view autoscroll="true">
+			<div class="content-view" contentview ng-view autoscroll="true">
 
 				<?php while ( have_posts() ) : the_post(); ?>
 

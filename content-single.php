@@ -26,6 +26,7 @@
 			</div><!-- .entry-content -->
 
 			<footer class="entry-footer">
+				<span>Previous</span><span>Next</span>
 				<?php johanbissemattsson_entry_footer(); ?>
 			</footer><!-- .entry-footer -->
 		</article><!-- #post-## -->

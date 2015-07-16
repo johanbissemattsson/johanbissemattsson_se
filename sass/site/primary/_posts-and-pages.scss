@@ -34,7 +34,12 @@
 	margin: 0 0 1.5em;
 }
 
+.hidden-grid {
+	display: none;
+}
+
 .grid-item,
+.isotope-item,
 .grid-sizer {
 	width: $size__site-grid-item;
 }
@@ -62,9 +67,10 @@
 
 .more-link:hover {
 		background-color: #f7f7f7;
+
 		.more-link-text {
-				opacity: 1;
-				display: inline-block;
+			opacity: 1;
+			display: inline-block;
 		}
 
 		.dotdotdot {
@@ -73,36 +79,55 @@
 }
 
 .site-description {
-	margin-top: 124vh;
-}
-
-.homepage-description {
 	margin-top: 24vh;
 }
 
+/*
 .slideup {
+	
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 100%;
+    max-width: $maxwidth__site-main;
     height: 100%;
+    
 }
-.slideup.ng-enter {
-    -webkit-transition: all 1s  ease;
-    transition: all 1s ease;
-}
-
+*/
+/*
+.slideup.ng-enter,
 .slideup.ng-leave {
-    -webkit-transition: all 0s  cubic-bezier(0.215, 0.61, 0.355, 1);
-    transition: all 0s  cubic-bezier(0.215, 0.61, 0.355, 1);
+    -webkit-transition: all 0.25s ease;
+    transition: all 0.25s ease;
 }
 .slideup.ng-enter {
-    transform: translate(0,0);
+    //top: 50%;
     opacity: 0;
 }
 .slideup.ng-enter-active {
+    //top: 0;
     opacity: 1;
-    transform: translate(1,1);
 }
 .slideup.ng-leave {
+    //top: 0;
     opacity: 1;
 }
 .slideup.ng-leave-active {
+    //top: -50%;
     opacity: 0;
 }
+.reverse .page.slideup.ng-enter {
+	top: 50%;
+}
+.reverse .page.slideup.ng-enter-active {
+	top: 0;
+}
+.reverse .page.slideup.ng-leave {
+	top: 50%;
+}
+.reverse .page.slideup.ng-leave-active {
+	top: 0%;
+}
+*/

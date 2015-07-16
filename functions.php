@@ -88,19 +88,21 @@ function johanbissemattsson_scripts() {
 
 	wp_enqueue_script( 'johanbissemattsson-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20130115', true );
 
-	wp_enqueue_script( 'johanbissemattsson-scripts', get_template_directory_uri() . '/js/main-dist.js', array( 'isotope', 'angularjs', 'angularjs-route', 'angularjs-sanitize', 'angularjs-animate'),'1.0', true );		
-	
-	wp_enqueue_script( 'isotope', '//cdnjs.cloudflare.com/ajax/libs/jquery.isotope/2.2.0/isotope.pkgd.min.js', array(),'2.2.0', true );
+	wp_enqueue_script( 'johanbissemattsson-scripts', get_template_directory_uri() . '/js/main-dist.js', array('jquery', 'isotope', 'images-loaded', 'angular-images-loaded', 'angularjs', 'angularjs-route', 'angularjs-sanitize', 'angularjs-animate'),'1.0', true );
 
-	wp_register_script( 'angularjs', get_template_directory_uri() . '/js/vendor/angular.js');
+	wp_register_script( 'angularjs', get_template_directory_uri() . '/js/vendor/angular.js', array('jquery', 'isotope' ));
 
-	wp_register_script( 'angularjs-route', get_template_directory_uri() . '/js/vendor/angular-route.js');
+	wp_register_script( 'angularjs-route', get_template_directory_uri() . '/js/vendor/angular-route.js', array('jquery', 'angularjs'));
 
-	wp_register_script( 'angularjs-sanitize', '//ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular-sanitize.js');
+	wp_register_script( 'angularjs-sanitize', '//ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular-sanitize.js', array('jquery', 'angularjs'));
 
-	wp_register_script( 'angularjs-animate', '//ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular-animate.js');
+	wp_register_script( 'angularjs-animate', '//ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular-animate.js', array('jquery', 'angularjs'));
 
-	wp_localize_script('johanbissemattsson-scripts','myLocalized', array( 'partials' => trailingslashit( get_template_directory_uri() ) . 'partials/' ) );	
+	wp_register_script( 'isotope', '//cdnjs.cloudflare.com/ajax/libs/jquery.isotope/2.2.0/isotope.pkgd.min.js', array('jquery'), '2.2.0', true );
+
+	wp_register_script( 'images-loaded', 'https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/3.1.8/imagesloaded.pkgd.min.js', array('jquery', 'isotope'));
+
+	wp_register_script( 'angular-images-loaded', get_template_directory_uri() . '/js/vendor/angular-images-loaded.js' , array('jquery', 'angularjs', 'isotope', 'images-loaded'));
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );

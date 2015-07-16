@@ -4,8 +4,6 @@
  */
 ?>
 <div class="grid-item">
-	<article id="post-<?php the_ID(); ?>" <?php post_class( 'item' ); ?>>
-		<header class="entry-header">
 
 			<a href="<?php the_permalink(); ?>" rel="bookmark">
 				<?php if ( has_post_thumbnail() ) {
@@ -25,10 +23,4 @@
 
 			</a>
 
-		</header><!-- .entry-header -->
-
-		<footer class="entry-footer">
-			<?php johanbissemattsson_entry_footer(); ?>
-		</footer><!-- .entry-footer -->
-	</article><!-- #post-## -->
 </div>
