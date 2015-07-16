@@ -1,6 +1,6 @@
 var app = angular.module('app', ['ngRoute', 'ngSanitize', 'ngAnimate', 'angular-images-loaded']).controller('MainController');
 
-app.directive('contentview', ['$templateCache', function($templateCache)
+app.directive('contentView', ['$templateCache', function($templateCache)
 {
     return {
         restrict: 'A',
@@ -60,7 +60,7 @@ app.config(function($routeProvider, $locationProvider) {
 
 })
 
-app.controller('MainController', function($scope ) {
+app.controller('MainController', function($scope, $location, $timeout) {
         $scope.imgLoadedEvents = {
 
             always: function(instance) {
@@ -85,7 +85,32 @@ app.controller('MainController', function($scope ) {
                 // Do stuff
             }
 
-        };    
+        };
+
+$scope.scrollPos = {}; // scroll position of each view
+
+        $(window).on('scroll', function() {
+            if ($scope.okSaveScroll) { // false between $routeChangeStart and $routeChangeSuccess
+                $scope.scrollPos[$location.path()] = $(window).scrollTop();
+                //console.log($scope.scrollPos);
+            }
+        });
+
+        $scope.scrollClear = function(path) {
+            $scope.scrollPos[path] = 0;
+        }
+
+        $scope.$on('$routeChangeStart', function() {
+            $scope.okSaveScroll = false;
+        });
+
+        $scope.$on('$routeChangeSuccess', function() {
+            $timeout(function() { // wait for DOM, then restore scroll position
+                $(window).scrollTop($scope.scrollPos[$location.path()] ? $scope.scrollPos[$location.path()] : 0);
+                $scope.okSaveScroll = true;
+            }, 100);
+        });
+
 });
 
 app.controller('IndexController', function($scope, $rootScope, $http, $routeParams, resourceCache) {
