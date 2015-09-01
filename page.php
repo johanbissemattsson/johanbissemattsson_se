@@ -14,7 +14,7 @@ get_header(); ?>
 
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
-			<div class="content-view" content-view ng-view autoscroll="false" keep-scroll-pos>		
+			<div class="content-view fade" content-view ng-view autoscroll="false">		
 
 				<?php while ( have_posts() ) : the_post(); ?>
 

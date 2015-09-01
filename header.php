@@ -28,7 +28,7 @@
 	<header id="masthead" class="site-header minified" role="banner">
 	<?php } ?>
 		<div class="site-branding">
-			<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
+			<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home" ng-click="gotoTop()"><?php bloginfo( 'name' ); ?></a></h1>
 		</div><!-- .site-branding -->
 	</header><!-- #masthead -->
 

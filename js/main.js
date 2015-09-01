@@ -20,7 +20,7 @@ app.directive('onLastRepeat', function() {
 });
 
 app.run(function($templateCache, $http, resourceCache ) {
-    $templateCache.put('main.html', '<div class="site-description" ng-bind-html="home.content"></div><div class="grid"><div class="grid-sizer"></div><div class="gutter-sizer"></div><div class="grid-item" ng-repeat="postitem in posts" on-last-repeat><a href="{{postitem.slug}}/" rel="bookmark"><img width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" src="{{postitem.featured_image.source}}" alt="{{postitem.title}}"><h1 class="entry-title">{{postitem.title}}</h1><div class="entry-details">{{postitem.acf.entry_details}}</div></a></div></div>');
+    $templateCache.put('main.html', '<div class="site-description" ng-bind-html="home.content"></div><div class="grid"><div class="grid-sizer"></div><div class="gutter-sizer"></div><div class="grid-item" ng-repeat="postitem in posts" on-last-repeat><a href="{{postitem.link}}" rel="bookmark"><img width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" src="{{postitem.featured_image.source}}" alt="{{postitem.title}}"><h1 class="entry-title">{{postitem.title}}</h1><div class="entry-details">{{postitem.acf.entry_details}}</div></a></div></div>');
     $templateCache.put('content.html', '<article id="post-{{post.ID}}" class="post-{{post.ID}} {{post.type}} type-{{post.type}}"><header class="entry-header"><h1 class="entry-title">{{post.title}}</h1><div class="entry-details">{{post.acf.entry_details}}</div></header><div class="entry-content" ng-bind-html="post.content"></div></article>');
     $http.get('wp-content/uploads/json/sitedata.json', {cache: resourceCache });
 });  
@@ -60,7 +60,8 @@ app.config(function($routeProvider, $locationProvider) {
 
 })
 
-app.controller('MainController', function($scope, $location, $timeout) {
+app.controller('MainController', ['$scope', '$rootScope', '$location', '$timeout', '$anchorScroll',
+    function($scope, $rootScope, $location, $timeout, $anchorScroll) {
         $scope.imgLoadedEvents = {
 
             always: function(instance) {
@@ -87,52 +88,98 @@ app.controller('MainController', function($scope, $location, $timeout) {
 
         };
 
-$scope.scrollPos = {}; // scroll position of each view
+        $scope.gotoTop = function() {
+            $scope.currentPath = $location.path();
+            if ($scope.currentPath =='/') {
+                $rootScope.scrollPos = 0;
+                $('html,body').animate({ scrollTop: $rootScope.scrollPos }, 500);    
+            }        
+        }        
+
+}]);
+/*
+.controller('ScrollController', ['$scope', '$location', '$anchorScroll',
+  function ($scope, $location, $anchorScroll) {
+    $scope.gotoBottom = function() {
+      // set the location.hash to the id of
+      // the element you wish to scroll to.
+      $location.hash('bottom');
+
+      // call $anchorScroll()
+      $anchorScroll();
+    };
+  }]);
+*/
+app.controller('IndexController', ['$scope', '$rootScope', '$http', '$routeParams', '$location', '$timeout', '$anchorScroll', 'resourceCache',
+    function($scope, $rootScope, $http, $routeParams, $location, $timeout, resourceCache) {
+
+        //Keep scroll position
 
         $(window).on('scroll', function() {
             if ($scope.okSaveScroll) { // false between $routeChangeStart and $routeChangeSuccess
-                $scope.scrollPos[$location.path()] = $(window).scrollTop();
-                //console.log($scope.scrollPos);
+                $rootScope.scrollPos = $(window).scrollTop();
             }
         });
 
-        $scope.scrollClear = function(path) {
-            $scope.scrollPos[path] = 0;
-        }
-
         $scope.$on('$routeChangeStart', function() {
-            $scope.okSaveScroll = false;
-        });
+                $scope.okSaveScroll = false;
+            });
 
         $scope.$on('$routeChangeSuccess', function() {
             $timeout(function() { // wait for DOM, then restore scroll position
-                $(window).scrollTop($scope.scrollPos[$location.path()] ? $scope.scrollPos[$location.path()] : 0);
+                $(window).scrollTop($rootScope.scrollPos);
                 $scope.okSaveScroll = true;
-            }, 100);
+            }, 100); //was 100
+        });    
+
+        $http.get('wp-content/uploads/json/sitedata.json', {cache: resourceCache }).success(function(res){
+            angular.forEach(res, function(postvalue, postkey) {
+                if(res[postkey].title == 'Home') {
+                    $scope.home = res[postkey];
+                    document.querySelector('title').innerHTML = 'Johan Bisse Mattsson';                        
+                } else if(res[postkey].slug == $routeParams.slug) {
+                    $scope.post = res[postkey];
+                }
+            })
+
+            $scope.imgLoadedEvents = {
+
+                always: function(instance) {
+                    // Do stuff
+                },
+
+                done: function(instance) {
+                        //angular.element(instance.elements[0]).addClass('loaded');
+                    var iso = new Isotope( '.grid', {
+                        percentPosition: "true",
+                        itemSelector: '.grid-item',
+                        layoutMode: 'masonry',
+                        transitionDuration: '0',
+                        masonry: {
+                            columnWidth: '.grid-sizer',
+                            gutter: '.gutter-sizer'
+                        }        
+                    });
+                },
+
+                fail: function(instance) {
+                    // Do stuff
+                }
+
+            };           
+
+            $scope.posts = res.filter(function(obj) {
+                if ('type' in obj && obj.type != 'post') {
+                    return false;
+                } else {
+                    return true;
+                }
+            });
         });
 
-});
-
-app.controller('IndexController', function($scope, $rootScope, $http, $routeParams, resourceCache) {
-
-    $http.get('wp-content/uploads/json/sitedata.json', {cache: resourceCache }).success(function(res){
-        angular.forEach(res, function(postvalue, postkey) {
-            if(res[postkey].title == 'Home') {
-                $scope.home = res[postkey];
-                document.querySelector('title').innerHTML = 'Johan Bisse Mattsson';                        
-            } else if(res[postkey].slug == $routeParams.slug) {
-                $scope.post = res[postkey];
-            }
-        })
-
-        $scope.imgLoadedEvents = {
-
-            always: function(instance) {
-                // Do stuff
-            },
-
-            done: function(instance) {
-                    //angular.element(instance.elements[0]).addClass('loaded');
+        $scope.$on('onRepeatLast', function(scope, element, attrs){
+            
+            imagesLoaded( '.grid', function() {
                 var iso = new Isotope( '.grid', {
                     percentPosition: "true",
                     itemSelector: '.grid-item',
@@ -143,42 +190,17 @@ app.controller('IndexController', function($scope, $rootScope, $http, $routePara
                         gutter: '.gutter-sizer'
                     }        
                 });
-            },
-
-            fail: function(instance) {
-                // Do stuff
-            }
-
-        };           
-
-        $scope.posts = res.filter(function(obj) {
-            if ('type' in obj && obj.type != 'post') {
-                return false;
-            } else {
-                return true;
-            }
-        });
-    });
-
-    $scope.$on('onRepeatLast', function(scope, element, attrs){
-        
-        imagesLoaded( '.grid', function() {
-            var iso = new Isotope( '.grid', {
-                percentPosition: "true",
-                itemSelector: '.grid-item',
-                layoutMode: 'masonry',
-                transitionDuration: '0',
-                masonry: {
-                    columnWidth: '.grid-sizer',
-                    gutter: '.gutter-sizer'
-                }        
             });
-        });
-    });    
-
-});
+        });     
+}]);
 
 app.controller('ContentController', function($scope, $http, $routeParams, resourceCache ) {
+
+    //Scroll to top
+    $scope.$on('$routeChangeSuccess', function() {
+        $(window).scrollTop(0);
+    });    
+
     $http.get('wp-content/uploads/json/sitedata.json', {cache: resourceCache }).success(function(res){
         angular.forEach(res, function(postvalue, postkey) {
             if(res[postkey].slug == $routeParams.slug) {

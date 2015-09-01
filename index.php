@@ -15,7 +15,7 @@ get_header(); ?>
 
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
-			<div class="content-view" content-view ng-view autoscroll="false" keep-scroll-pos>
+			<div class="content-view fade" content-view ng-view autoscroll="false">
 				<div class="site-description homepage-description">
 					<?php
 						$homepage = get_page_by_title('Home'); 
@@ -25,7 +25,7 @@ get_header(); ?>
 				</div>
 
 				<?php if ( is_front_page() ) { ?>
-				<div class="grid" images-loaded="imgLoadedEvents">
+				<div class="grid effect" images-loaded="imgLoadedEvents">
 					<div class="grid-sizer"></div>
 					<div class="gutter-sizer"></div>
 					
