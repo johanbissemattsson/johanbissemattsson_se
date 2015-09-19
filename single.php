@@ -9,7 +9,8 @@ get_header(); ?>
 
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
-			<div class="content-view fade" content-view ng-view autoscroll="false">
+			<div class="index-view" index-view ui-view="indexView" autoscroll="false"></div>
+			<div class="post-view" post-view ui-view="postView" autoscroll="false" ng-if="postView">
 
 				<?php while ( have_posts() ) : the_post(); ?>
 
