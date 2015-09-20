@@ -17,8 +17,11 @@
 
 <?php wp_head(); ?>
 </head>
-
+<?php if ( is_front_page() ) { ?>
 <body <?php body_class(); ?>>
+<?php } else { ?>
+<body <?php body_class("single");?>>
+<?php } ?>
 <div id="page" class="hfeed site">
 	<a class="skip-link screen-reader-text" href="#content"><?php _e( 'Skip to content', 'johanbissemattsson' ); ?></a>
 
@@ -32,4 +35,4 @@
 		</div><!-- .site-branding -->
 	</header><!-- #masthead -->
 
-	<div id="content" class="site-content">
+	<div id="content" class="site-content content-view" content-view ui-view="contentView">

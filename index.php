@@ -15,6 +15,7 @@ get_header(); ?>
 
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
+		
 			<div class="index-view" index-view ui-view="indexView" autoscroll="false">
 				<div class="site-description homepage-description">
 					<?php
@@ -51,10 +52,12 @@ get_header(); ?>
 					// Restore original Post Data
 					wp_reset_postdata();
 					?>
-
+						
 				</div>
 			</div>
-			<div class="post-view fade" post-view ui-view="postView" autoscroll="false" ng-if="postView"></div>
+
+			<div class="post-view" post-view ui-view="postView" autoscroll="false"></div>
+
 		</main><!-- #main -->
 	</div><!-- #primary -->
 

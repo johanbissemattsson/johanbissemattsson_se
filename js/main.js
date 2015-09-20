@@ -1,23 +1,12 @@
 var app = angular.module('app', ['ui.router', 'ngSanitize', 'ngAnimate', 'angular-images-loaded']).controller('MainController');
 
-app.directive('indexView', ['$templateCache', function($templateCache)
+app.directive('contentView', ['$templateCache', function($templateCache)
 {
     return {
         restrict: 'A',
         compile:  function (element)
         {
-            $templateCache.put('initialcontent-indexview.html', element.html());
-        }
-    };
-}])
-
-app.directive('postView', ['$templateCache', function($templateCache)
-{
-    return {
-        restrict: 'A',
-        compile:  function (element)
-        {
-            $templateCache.put('initialcontent-postview.html', element.html());
+            $templateCache.put('initialcontent.html', element.html());
         }
     };
 }])
@@ -39,25 +28,51 @@ app.directive('onLastRepeat', function() {
 });
 
 app.run(function($templateCache, $http, resourceCache) {
-    $templateCache.put('indexview.html', '<p>Från indexview.html</p><div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-sizer"></div><div class="gutter-sizer"></div><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{data.postitem.link}}" rel="bookmark"><img width="{{data.postitem.featured_image.attachment_meta.width}}" height="{{data.postitem.featured_image.attachment_meta.height}}" src="{{data.postitem.featured_image.source}}" alt="{{data.postitem.title}}"><h1 class="entry-title">{{data.postitem.title}}</h1><div class="entry-details">{{data.postitem.acf.entry_details}}</div></a></div></div>');
-    $templateCache.put('postview.html', '<p>Från postview.html</p><article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><div class="entry-details">{{data.post.acf.entry_details}}</div></header><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
+    $templateCache.put('indexview.html', '<div id="primary" class="content-area"><main id="main" class="site-main" role="main"><div class="index-view" index-view ui-view="indexView" autoscroll="false"><div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-sizer"></div><div class="gutter-sizer"></div><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{data.postitem.link}}" rel="bookmark"><img width="{{data.postitem.featured_image.attachment_meta.width}}" height="{{data.postitem.featured_image.attachment_meta.height}}" src="{{data.postitem.featured_image.source}}" alt="{{data.postitem.title}}"><h1 class="entry-title">{{data.postitem.title}}</h1><div class="entry-details">{{data.postitem.acf.entry_details}}</div></a></div></div></div><div class="post-view" post-view ui-view="postView"></div></main></div>');
+    $templateCache.put('postview.html', '<article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><div class="entry-details">{{data.post.acf.entry_details}}</div></header><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
     $http.get('wp-content/uploads/json/sitedata.json', {cache: resourceCache });
 });
 
 app.controller('MainController', ['$scope', '$rootScope', '$state', '$location', '$timeout', '$anchorScroll', 'stateStatusService',
     function($scope, $rootScope, $state, $location, $timeout, $anchorScroll, stateStatusService) {
 
+    /*$scope.$on('$routeChangeStart', function() {
+            $scope.okSaveScroll = false;
+        });
+
+    $scope.$on('$routeChangeSuccess', function() {
+        $timeout(function() { // wait for DOM, then restore scroll position
+            $(window).scrollTop($rootScope.scrollPos);
+            $scope.okSaveScroll = true;
+        }, 100); //was 100
+    });*/
+
+        $rootScope.$on('$stateChangeStart', 
+        function(event, toState, toParams, fromState, fromParams){
+            console.log("set saveScroll temporarily false");
+            stateStatusService.saveScroll(false);
+
+        });
+
         $rootScope.$on('$stateChangeSuccess',
         function(event, toState, toParams, fromState, fromParams ) {
-            $state.current = toState;
-            if(toState.name == "index") {
-                $scope.postView = false;
-                stateStatusService.indexLoaded(true);
-            } else {
-                $scope.postView = true;
-                console.log("JENGIJENGJE");
+
+            if (!stateStatusService.startState()) {
+                stateStatusService.startState(toState.name);
+                console.log("Start state is... " + stateStatusService.startState());
             }
 
+            stateStatusService.currentState(toState.name);
+            if (stateStatusService.currentState() == "index") {
+                if (stateStatusService.indexLoaded(true)) {
+
+                } else {
+                    stateStatusService.indexLoaded(true);
+                };
+                $('body').removeClass('single');                                
+            } else {
+                $('body').addClass('single');                
+            };
         });
 
         $scope.imgLoadedEvents = {
@@ -65,7 +80,7 @@ app.controller('MainController', ['$scope', '$rootScope', '$state', '$location',
                 // Do stuff
             },
             done: function(instance) {
-                //angular.element(instance.elements[0]).addClass('loaded');
+                angular.element(instance.elements[0]).addClass('loaded');
                 var iso = new Isotope( '.grid', {
                     percentPosition: "true",
                     itemSelector: '.grid-item',
@@ -81,12 +96,23 @@ app.controller('MainController', ['$scope', '$rootScope', '$state', '$location',
                 // Do stuff
             }
         };
+/*
+        //Keep scroll position
+            $(window).on('scroll', function() {
+                if (stateStatusService.currentState() == "index") {
+                    console.log($(window).scrollTop());
+                    if (stateStatusService.saveScroll()) { // false between $routeChangeStart and $routeChangeSuccess
+                        stateStatusService.scrollPos($(window).scrollTop());
+                    }
+                }        
 
+            });
+*/
         $scope.gotoTop = function() {
             $scope.currentPath = $location.path();
             if ($scope.currentPath =='/') {
-                $rootScope.scrollPos = 0;
-                $('html,body').animate({ scrollTop: $rootScope.scrollPos }, 500);    
+                stateStatusService.scrollPos(0);
+                $('html,body').animate({ scrollTop: 0}, 500);    
             }        
         }        
 
@@ -111,8 +137,8 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
                         return;
                     }
                 } else {
-                    console.log("get initialcontent-indexview.html (php)");                                                                                        
-                    return $templateRequest('initialcontent-indexview.html');                    
+                    console.log("get initialcontent.html (php)");                                                                                        
+                    return $templateRequest('initialcontent.html');                    
                 }
             },
             promiseObj: function ($stateParams, resourceCache, stateStatusService, wpService) {
@@ -127,7 +153,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
             }
         },
         views: {
-            'indexView@': {
+            'contentView@': {
                 templateProvider: function(indexTemplateCacheOrInitialContent, stateStatusService) {
                     if (!stateStatusService.indexLoaded()) {
                         console.log("IndexLoaded: " + stateStatusService.indexLoaded());                        
@@ -137,12 +163,62 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
                     }
                 },
                 controller: 'IndexController'           
-            },
-            /*'postView@': {
-                template: "&nbsp;"
-            }*/
+            }
         }
     })
+
+/*
+    .state('index.init', {
+        resolve: {
+            indexTemplateCacheOrInitialContent: function ($templateRequest, stateStatusService) {                
+                if(stateStatusService.dataFromJSON()) {
+                    if (!stateStatusService.indexLoaded()) {                    
+                        console.log("get indexview.html (json)");                                                                    
+                        return $templateRequest('indexview.html');
+                    } else {
+                        console.log("Index already has been loaded so skip resolve part");                        
+                        return;
+                    }
+                } else {
+                    console.log("get initialcontent.html (php)");                                                                                        
+                    return $templateRequest('initialcontent.html');                    
+                }
+            },
+            promiseObj: function ($stateParams, resourceCache, stateStatusService, wpService) {
+                if (stateStatusService.dataFromJSON()) {
+                    return wpService.getIndex();
+                    return wpService;                                    
+                } else {
+                    console.log("initDataFromJSON (index state)");
+                    stateStatusService.initDataFromJSON();
+                } 
+                return;
+            }
+        },
+        views: {
+
+        }
+    })
+
+    .state('index.fromCache', {
+        resolve: {
+
+        },
+        views: {
+           'contentView@': {
+                templateProvider: function(indexTemplateCacheOrInitialContent, stateStatusService) {
+                    if (!stateStatusService.indexLoaded()) {
+                        console.log("IndexLoaded: " + stateStatusService.indexLoaded());                        
+                        return indexTemplateCacheOrInitialContent;
+                    } else {
+                        console.log("Index already has been loaded so skip view part");
+                    }
+                },
+                controller: 'IndexController'  
+            }
+        }
+    })
+*/
     .state('post', {
         url: '/:slug/',
         resolve: {
@@ -151,8 +227,8 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
                     console.log("get postview.html (json)");                                                                    
                     return $templateRequest('postview.html');
                 } else {
-                    console.log("get initialcontent-postview.html (php)");                                                                                        
-                    return $templateRequest('initialcontent-postview.html');                    
+                    console.log("get initialcontent.html (php)");                                                                                        
+                    return $templateRequest('initialcontent.html');                    
                 }
             },
             promiseObj: function ($stateParams, resourceCache, stateStatusService, wpService) {                                
@@ -177,15 +253,13 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
     })  
 });
 
-app.controller('IndexController', ['$scope', 'promiseObj', function($scope, promiseObj) {
-    $( "body" ).removeClass( "single" );        
+app.controller('IndexController', ['$scope', 'promiseObj', '$timeout', '$anchorScroll', function($scope, promiseObj, $timeout, $anchorScroll) {
     if(promiseObj) {
         $scope.data = promiseObj;       
     };
 }]);
 
 app.controller('PostController', ['$scope','promiseObj', function($scope, promiseObj) {
-    $( "body" ).addClass( "single" );    
     if(promiseObj) {
         $scope.data = promiseObj;       
     }
@@ -241,13 +315,20 @@ app.factory('wpService', ['$http', '$q', '$stateParams', 'resourceCache', functi
 
 app.service('stateStatusService', function () {
     var stringStartState;
+    var stringCurrentState;
     var boolDataFromJSON = false;
     var boolIndexLoaded = false;
+    var boolSaveScroll = true;    
+    var intScrollPos = 0;
 
     return {
         startState: function (value) {
-            stringStartState = value;
-            return stringStartState;            
+            if (value) {
+                stringStartState = value;
+                return;
+            } else {
+                return stringStartState;            
+            }
         },
         dataFromJSON: function () {
             return boolDataFromJSON;
@@ -262,6 +343,30 @@ app.service('stateStatusService', function () {
                 return;
             } else {
                 return boolIndexLoaded;
+            }
+        },
+        saveScroll: function (value) {
+            if (value) {
+                boolSaveScroll = value;
+                return;
+            } else {
+                return boolSaveScroll;
+            }            
+        },
+        scrollPos: function (value) {
+            if (value) {
+                intScrollPos = value;
+                return;
+            } else {
+                return intScrollPos;
+            }            
+        },
+        currentState: function (value) {
+            if (value) {
+                stringCurrentState = value;
+                return;
+            } else {
+                return stringCurrentState;
             }
         }
     }

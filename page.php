@@ -14,9 +14,10 @@ get_header(); ?>
 
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
-			<div class="index-view" index-view ui-view="indexView" autoscroll="false"></div>		
-			<div class="post-view fade" post-view ui-view="postView" autoscroll="false" ng-if="postView">		
 
+			<div class="index-view" index-view ui-view="indexView" autoscroll="false"></div>
+					
+			<div class="post-view" post-view ui-view="postView" autoscroll="false">
 				<?php while ( have_posts() ) : the_post(); ?>
 
 					<?php get_template_part( 'content', 'page' ); ?>
@@ -28,8 +29,7 @@ get_header(); ?>
 						endif;
 					?>
 
-				<?php endwhile; // end of the loop. ?>
-
+				<?php endwhile; // end of the loop. ?>				
 			</div>
 		</main><!-- #main -->
 	</div><!-- #primary -->
