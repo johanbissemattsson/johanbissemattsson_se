@@ -49,30 +49,40 @@ app.controller('MainController', ['$scope', '$rootScope', '$state', '$location',
 
         $rootScope.$on('$stateChangeStart', 
         function(event, toState, toParams, fromState, fromParams){
-            console.log("set saveScroll temporarily false");
-            stateStatusService.saveScroll(false);
 
+
+            if (!stateStatusService.startState()) {
+                if (toState.name == 'index') {
+                    stateStatusService.startState(toState.name);
+                    stateStatusService.indexInitialized(true);
+                    console.log("Start state is... " + stateStatusService.startState());                                       
+                } else {
+                    stateStatusService.startState(toState.name);
+                    console.log("Start state is... " + stateStatusService.startState());                    
+                }
+            }
+
+            if (toState.name == 'index') {            
+                event.preventDefault();
+                $('body').removeClass('single');                                
+                if(stateStatusService.indexInitialized()) {
+                    $state.go('index.load');                  
+                } else {
+                    stateStatusService.indexInitialized(true);                    
+                    $state.go('index.init');                 
+                }
+            }
+            //console.log("set saveScroll temporarily false");
+            //stateStatusService.saveScroll(false);
         });
 
         $rootScope.$on('$stateChangeSuccess',
         function(event, toState, toParams, fromState, fromParams ) {
 
-            if (!stateStatusService.startState()) {
-                stateStatusService.startState(toState.name);
-                console.log("Start state is... " + stateStatusService.startState());
-            }
-
-            stateStatusService.currentState(toState.name);
-            if (stateStatusService.currentState() == "index") {
-                if (stateStatusService.indexLoaded(true)) {
-
-                } else {
-                    stateStatusService.indexLoaded(true);
-                };
-                $('body').removeClass('single');                                
-            } else {
+            //str.indexOf("welcome")
+            if ("index".indexOf(toState.name) != -1) {
                 $('body').addClass('single');                
-            };
+            }
         });
 
         $scope.imgLoadedEvents = {
@@ -125,6 +135,86 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
 
     $stateProvider
     .state('index', {
+        url: '/' // Redirect to index.init and index.load is made in stateChangeStart
+    })
+
+    .state('index.load', {
+        resolve: {
+            tempIndexLoadResolveFunction: function ($templateRequest, stateStatusService) {
+                console.log("Index Load funkar!!!!!!! snurra uppe till vänster!");
+            }            
+        }
+    })    
+
+    .state('index.init', {
+        resolve: {
+            indexTemplateCacheOrInitialContent: function ($templateRequest, stateStatusService) {                
+                if(stateStatusService.dataFromJSON()) {
+                    console.log("get indexview.html (json)");                                                                    
+                    return $templateRequest('indexview.html');
+                } else {
+                    console.log("get initialcontent.html (php)");                                                                                        
+                    return $templateRequest('initialcontent.html');                    
+                }
+            },
+            promiseObj: function ($stateParams, resourceCache, stateStatusService, wpService) {
+                if (stateStatusService.dataFromJSON()) {
+                    return wpService.getIndex();
+                    return wpService;                                    
+                } else {
+                    console.log("Set data from json true");
+                    stateStatusService.dataFromJSON(true);
+                } 
+                return;
+            }         
+        },
+        views: {
+            'indexView@': {
+                templateProvider: function(indexTemplateCacheOrInitialContent, stateStatusService) {
+                    return indexTemplateCacheOrInitialContent;
+                },
+                controller: 'IndexController'           
+            }
+        }
+    })             
+
+    .state('post', {
+        url: '/:slug/',
+        resolve: {
+            postTemplateCacheOrInitialContent: function ($templateRequest, stateStatusService) {
+                if(stateStatusService.dataFromJSON()) {
+                    console.log("get postview.html (json)");                                                                    
+                    return $templateRequest('postview.html');
+                } else {
+                    console.log("get initialcontent.html (php)");                                                                                        
+                    return $templateRequest('initialcontent.html');                    
+                }
+            },
+            promiseObj: function ($stateParams, resourceCache, stateStatusService, wpService) {                                
+               if (stateStatusService.dataFromJSON()) {
+                    return wpService.getPost($stateParams.slug);
+                    return wpService;
+                } else {
+                    console.log("initDataFromJSON (post state)");
+                    stateStatusService.dataFromJSON(true);
+                } 
+                return;
+            }
+        },
+        views: {
+            'postView@': {
+                templateProvider: function(postTemplateCacheOrInitialContent) {
+                    return postTemplateCacheOrInitialContent;
+                },
+                controller: 'PostController'           
+            }
+        }
+    });  
+});
+
+/*
+    $stateProvider
+    .state('index', {
         url: '/',
         resolve: {
             indexTemplateCacheOrInitialContent: function ($templateRequest, stateStatusService) {                
@@ -167,58 +257,6 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
         }
     })
 
-/*
-    .state('index.init', {
-        resolve: {
-            indexTemplateCacheOrInitialContent: function ($templateRequest, stateStatusService) {                
-                if(stateStatusService.dataFromJSON()) {
-                    if (!stateStatusService.indexLoaded()) {                    
-                        console.log("get indexview.html (json)");                                                                    
-                        return $templateRequest('indexview.html');
-                    } else {
-                        console.log("Index already has been loaded so skip resolve part");                        
-                        return;
-                    }
-                } else {
-                    console.log("get initialcontent.html (php)");                                                                                        
-                    return $templateRequest('initialcontent.html');                    
-                }
-            },
-            promiseObj: function ($stateParams, resourceCache, stateStatusService, wpService) {
-                if (stateStatusService.dataFromJSON()) {
-                    return wpService.getIndex();
-                    return wpService;                                    
-                } else {
-                    console.log("initDataFromJSON (index state)");
-                    stateStatusService.initDataFromJSON();
-                } 
-                return;
-            }
-        },
-        views: {
-
-        }
-    })
-
-    .state('index.fromCache', {
-        resolve: {
-
-        },
-        views: {
-           'contentView@': {
-                templateProvider: function(indexTemplateCacheOrInitialContent, stateStatusService) {
-                    if (!stateStatusService.indexLoaded()) {
-                        console.log("IndexLoaded: " + stateStatusService.indexLoaded());                        
-                        return indexTemplateCacheOrInitialContent;
-                    } else {
-                        console.log("Index already has been loaded so skip view part");
-                    }
-                },
-                controller: 'IndexController'  
-            }
-        }
-    })
-*/
     .state('post', {
         url: '/:slug/',
         resolve: {
@@ -252,6 +290,8 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
         }
     })  
 });
+
+*/
 
 app.controller('IndexController', ['$scope', 'promiseObj', '$timeout', '$anchorScroll', function($scope, promiseObj, $timeout, $anchorScroll) {
     if(promiseObj) {
@@ -315,11 +355,12 @@ app.factory('wpService', ['$http', '$q', '$stateParams', 'resourceCache', functi
 
 app.service('stateStatusService', function () {
     var stringStartState;
-    var stringCurrentState;
     var boolDataFromJSON = false;
     var boolIndexLoaded = false;
     var boolSaveScroll = true;    
     var intScrollPos = 0;
+    var boolStringInitialized = false;
+    var varrenameThis = 0;
 
     return {
         startState: function (value) {
@@ -330,12 +371,13 @@ app.service('stateStatusService', function () {
                 return stringStartState;            
             }
         },
-        dataFromJSON: function () {
-            return boolDataFromJSON;
-        },
-        initDataFromJSON: function () {
-            boolDataFromJSON = true;
-            return;
+        dataFromJSON: function (value) {
+            if (value) {
+                boolDataFromJSON = value;
+                return;
+            } else {
+                return boolDataFromJSON;
+            }
         },
         indexLoaded: function (value) {
             if (value) {
@@ -361,12 +403,20 @@ app.service('stateStatusService', function () {
                 return intScrollPos;
             }            
         },
-        currentState: function (value) {
+        indexInitialized: function (value) {
             if (value) {
-                stringCurrentState = value;
+                boolStringInitialized = value;
                 return;
             } else {
-                return stringCurrentState;
+                return boolStringInitialized;
+            }
+        },
+        renameThis: function (value) {
+            if (value) {
+                varrenameThis = value;
+                return;
+            } else {
+                return varrenameThis;
             }
         }
     }
