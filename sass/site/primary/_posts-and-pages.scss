@@ -39,12 +39,13 @@
 }
 
 .grid {
-	transition: opacity 0.5s;
+	opacity: 0;
 }
 
 .loaded {
 	opacity: 1;
 }
+
 .grid-item,
 .isotope-item,
 .grid-sizer {
@@ -89,20 +90,24 @@
 	margin-top: 24vh;
 }
 
+.post-view {
+	display: none;
+}
 
 // Turn off background body scrolling when showing single posts
-.single {
+.post {
 	overflow-x: hidden;
 	overflow-y: hidden;
-	background-color: #ddd;
+	background-color: #fff;
     transition: background-color 1s;
 
 	.index-view {
-		-webkit-filter: blur(12px) saturate(3);
-		filter: blur(12px) saturate(3) ;
+		/*-webkit-filter: blur(4px) saturate(1);
+		filter: blur(4px) saturate(1);*/
+		opacity: 0;
 
-		transition: opacity 3s, blur 3s, saturate 5s;
-   		-webkit-transform: translateZ();
+		transition: opacity 0.25s, filter 0.5s, saturate 0.5s;
+   		-webkit-transform: translateZ(0);
    		-moz-transform: translateZ(0);
    		-ms-transform: translateZ(0);
    		-o-transform: translateZ(0);
@@ -110,6 +115,7 @@
 	}
 
 	.post-view {
+		display: block;
 		position: fixed;
 		top: 0;
 		left: 0;

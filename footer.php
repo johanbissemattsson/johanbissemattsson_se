@@ -7,8 +7,6 @@
  * @package johanbissemattsson
  */
 ?>
-
-	</div><!-- #content -->
 	
 </div><!-- #page -->
 

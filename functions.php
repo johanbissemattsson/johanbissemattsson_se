@@ -91,7 +91,8 @@ function johanbissemattsson_scripts() {
 	wp_enqueue_script( 'johanbissemattsson-scripts', get_template_directory_uri() . '/js/main-dist.js', array('jquery', 'isotope', 'images-loaded', 'angular-images-loaded', 'angularjs', 'angularjs-uirouter', 'angularjs-sanitize', 'angularjs-animate'),'1.0', true );
 
 	wp_deregister_script( 'jquery' );
-	wp_register_script( 'jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js', array(), '2.2.0', true );
+	wp_register_script( 'jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js', array(), '1.11.3', true );
+
 	wp_register_script( 'jquery-ui', get_template_directory_uri() . 'js/vendor/jquery-ui.min.js', array('jquery') );
 
 	wp_register_script( 'angularjs', get_template_directory_uri() . '/js/vendor/angular.js', array('jquery', 'isotope' ));

@@ -1,12 +1,23 @@
 var app = angular.module('app', ['ui.router', 'ngSanitize', 'ngAnimate', 'angular-images-loaded']).controller('MainController');
 
-app.directive('contentView', ['$templateCache', function($templateCache)
+app.directive('indexView', ['$templateCache', function($templateCache)
 {
     return {
         restrict: 'A',
         compile:  function (element)
         {
-            $templateCache.put('initialcontent.html', element.html());
+            $templateCache.put('indexview-initialcontent.html', element.html());
+        }
+    };
+}])
+
+app.directive('postView', ['$templateCache', function($templateCache)
+{
+    return {
+        restrict: 'A',
+        compile:  function (element)
+        {
+            $templateCache.put('postview-initialcontent.html', element.html());
         }
     };
 }])
@@ -28,7 +39,7 @@ app.directive('onLastRepeat', function() {
 });
 
 app.run(function($templateCache, $http, resourceCache) {
-    $templateCache.put('indexview.html', '<div id="primary" class="content-area"><main id="main" class="site-main" role="main"><div class="index-view" index-view ui-view="indexView" autoscroll="false"><div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-sizer"></div><div class="gutter-sizer"></div><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{data.postitem.link}}" rel="bookmark"><img width="{{data.postitem.featured_image.attachment_meta.width}}" height="{{data.postitem.featured_image.attachment_meta.height}}" src="{{data.postitem.featured_image.source}}" alt="{{data.postitem.title}}"><h1 class="entry-title">{{data.postitem.title}}</h1><div class="entry-details">{{data.postitem.acf.entry_details}}</div></a></div></div></div><div class="post-view" post-view ui-view="postView"></div></main></div>');
+    $templateCache.put('indexview.html', '<div class="site-description" ng-bind-html="data.home.content"></div><div class="grid effect" images-loaded="imgLoadedEvents"><div class="grid-sizer"></div><div class="gutter-sizer"></div><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{postitem.link}}" rel="bookmark"><img ng-src="{{postitem.featured_image.source}}" width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" alt="{{postitem.title}}"><h1 class="entry-title">{{postitem.title}}</h1><div class="entry-details">{{postitem.acf.entry_details}}</div></a></div>');
     $templateCache.put('postview.html', '<article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><div class="entry-details">{{data.post.acf.entry_details}}</div></header><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
     $http.get('wp-content/uploads/json/sitedata.json', {cache: resourceCache });
 });
@@ -53,22 +64,19 @@ app.controller('MainController', ['$scope', '$rootScope', '$state', '$location',
 
             if (!stateStatusService.startState()) {
                 if (toState.name == 'index') {
-                    stateStatusService.startState(toState.name);
                     stateStatusService.indexInitialized(true);
-                    console.log("Start state is... " + stateStatusService.startState());                                       
-                } else {
-                    stateStatusService.startState(toState.name);
-                    console.log("Start state is... " + stateStatusService.startState());                    
                 }
+                stateStatusService.startState(toState.name);
+                console.log("Start state is... " + stateStatusService.startState());
             }
 
-            if (toState.name == 'index') {            
+            if (toState.name == 'index') {
                 event.preventDefault();
-                $('body').removeClass('single');                                
                 if(stateStatusService.indexInitialized()) {
-                    $state.go('index.load');                  
+                    stateStatusService.dataFromJSON(true);                    
+                    $state.go('index.load');
                 } else {
-                    stateStatusService.indexInitialized(true);                    
+                    stateStatusService.dataFromJSON(true);
                     $state.go('index.init');                 
                 }
             }
@@ -78,11 +86,12 @@ app.controller('MainController', ['$scope', '$rootScope', '$state', '$location',
 
         $rootScope.$on('$stateChangeSuccess',
         function(event, toState, toParams, fromState, fromParams ) {
-
-            //str.indexOf("welcome")
-            if ("index".indexOf(toState.name) != -1) {
-                $('body').addClass('single');                
+            if (toState.name == "post") {
+                $('body').removeClass('index').addClass('post');
+            } else {
+                $('body').removeClass('post').addClass('index');                
             }
+
         });
 
         $scope.imgLoadedEvents = {
@@ -140,7 +149,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
 
     .state('index.load', {
         resolve: {
-            tempIndexLoadResolveFunction: function ($templateRequest, stateStatusService) {
+            tempIndexLoadResolveFunction: function (stateStatusService) {
                 console.log("Index Load funkar!!!!!!! snurra uppe till vänster!");
             }            
         }
@@ -154,16 +163,20 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
                     return $templateRequest('indexview.html');
                 } else {
                     console.log("get initialcontent.html (php)");                                                                                        
-                    return $templateRequest('initialcontent.html');                    
+                    return $templateRequest('indexview-initialcontent.html');                    
                 }
             },
             promiseObj: function ($stateParams, resourceCache, stateStatusService, wpService) {
                 if (stateStatusService.dataFromJSON()) {
+                    //stateStatusService.indexInitialized(true);                                        
+                    console.log("hej");
                     return wpService.getIndex();
                     return wpService;                                    
                 } else {
                     console.log("Set data from json true");
+                    console.log("2");                    
                     stateStatusService.dataFromJSON(true);
+                    stateStatusService.indexInitialized(true);                    
                 } 
                 return;
             }         
@@ -187,7 +200,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
                     return $templateRequest('postview.html');
                 } else {
                     console.log("get initialcontent.html (php)");                                                                                        
-                    return $templateRequest('initialcontent.html');                    
+                    return $templateRequest('postview-initialcontent.html');                    
                 }
             },
             promiseObj: function ($stateParams, resourceCache, stateStatusService, wpService) {                                
@@ -196,6 +209,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
                     return wpService;
                 } else {
                     console.log("initDataFromJSON (post state)");
+                    console.log("3");                    
                     stateStatusService.dataFromJSON(true);
                 } 
                 return;
@@ -293,7 +307,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
 
 */
 
-app.controller('IndexController', ['$scope', 'promiseObj', '$timeout', '$anchorScroll', function($scope, promiseObj, $timeout, $anchorScroll) {
+app.controller('IndexController', ['$scope', 'promiseObj', '$timeout', '$anchorScroll', 'stateStatusService', function($scope, promiseObj, $timeout, $anchorScroll, stateStatusService) {
     if(promiseObj) {
         $scope.data = promiseObj;       
     };
@@ -320,27 +334,33 @@ app.factory('wpService', ['$http', '$q', '$stateParams', 'resourceCache', functi
         };
 
         wpService.getIndex = function() {
-            return $http.get('wp-content/uploads/json/sitedata.json',{cache: resourceCache }).success(function(res){
-                angular.forEach(res, function(postvalue, postkey) {
-                    if(res[postkey].title == 'Home') {
-                        wpService.home = res[postkey];
+            return $http.get('wp-content/uploads/json/sitedata.json',{cache: resourceCache }).success(function(resindex){
+                angular.forEach(resindex, function(postvalue, postkey) {
+                    if(resindex[postkey].title == 'Home') {
+                        wpService.home = resindex[postkey];
                         document.querySelector('title').innerHTML = 'Johan Bisse Mattsson';                        
-                    } else if(res[postkey].slug == $stateParams.slug) {
-                        wpService.posts = res[postkey];
+                    } else if(resindex[postkey].slug == $stateParams.slug) {
+                        wpService.posts = resindex[postkey];
                     }
-                });                
-                wpService.posts = res;
+                });
+
+                for(var i = resindex.length - 1; i >= 0; i--) {
+                    if(resindex[i].type !=  'post') {
+                        resindex.splice(i, 1);
+                    }
+                }
+                wpService.posts = resindex;
             }).then(function() {
                 return wpService;
             });      
         };
 
         wpService.getPost = function(slug) {
-            return $http.get('wp-content/uploads/json/sitedata.json',{cache: resourceCache }).success(function(res){
-                angular.forEach(res, function(postvalue, postkey) {
-                    if(res[postkey].slug == slug) {
-                        wpService.post = res[postkey];
-                        document.querySelector('title').innerHTML = res[postkey].title + ' | Johan Bisse Mattsson';        
+            return $http.get('wp-content/uploads/json/sitedata.json',{cache: resourceCache }).success(function(respost){
+                angular.forEach(respost, function(postvalue, postkey) {
+                    if(respost[postkey].slug == slug) {
+                        wpService.post = respost[postkey];
+                        document.querySelector('title').innerHTML = respost[postkey].title + ' | Johan Bisse Mattsson';        
                     }
                 });
             }).then(function() {
