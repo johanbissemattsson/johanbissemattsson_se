@@ -20,7 +20,7 @@
 <?php if ( is_front_page() ) { ?>
 <body>
 <?php } else { ?>
-<body class="post">
+<body class="single">
 <?php } ?>
 <div id="page" class="hfeed site">
 	<a class="skip-link screen-reader-text" href="#content"><?php _e( 'Skip to content', 'johanbissemattsson' ); ?></a>
@@ -34,3 +34,5 @@
 			<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home" ng-click="gotoTop()"><?php bloginfo( 'name' ); ?></a></h1>
 		</div><!-- .site-branding -->
 	</header><!-- #masthead -->
+
+	<div id="content" class="site-content content-view" content-view ui-view="contentView">	

@@ -90,23 +90,84 @@
 	margin-top: 24vh;
 }
 
-.post-view {
-	display: none;
+
+.index-view {
+	transition: opacity 1s, filter 0.5s, saturate 0.5s;
+	transition: opacity 1s, -webkit-filter 0.5s, saturate.50s;
+
 }
 
+.post-view {
+	transition: opacity 1s;
+		//display: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 9000;
+
+}
+
+.post-view.ng-enter, .post-view.ng-leave {
+	display: block !important;	
+	-webkit-transition:all .25s ease-in-out;
+    -moz-transition:all .25s ease-in-out;
+    -o-transition:all .25s ease-in-out;
+    transition:all .25s ease-in-out;
+}
+
+.post-view.ng-leave {
+	display: block !important;		
+	opacity: 0;
+ 	-webkit-transition:all .25s ease-in-out;
+    -moz-transition:all .25s ease-in-out;
+    -o-transition:all .25s ease-in-out;
+    transition:all .25s ease-in-out;   
+}
+
+.post-view.ng-enter {
+	display: block !important;	
+
+  -webkit-transform:scale3d(0.5, 0.5, 0.5);
+  -moz-transform:scale3d(0.5, 0.5, 0.5);
+  transform:scale3d(0.5, 0.5, 0.5);  
+}
+
+.post-view.ng-enter-active {
+	display: block !important;		
+  opacity: 1;
+  -webkit-transform:scale3d(1, 1, 1);
+  -moz-transform:scale3d(1, 1, 1);
+  transform:scale3d(1, 1, 1); 
+}
+
+.post-view {
+		display: none;
+	}
+
+.index-view {
+    	-webkit-filter: none;
+	}
+
+
+.index {
+	.post-view {
+		opacity: 0;
+	}
+}
+
+
 // Turn off background body scrolling when showing single posts
-.post {
+.single {
 	overflow-x: hidden;
 	overflow-y: hidden;
-	background-color: #fff;
-    transition: background-color 1s;
+	//background-color: #fff;
+    //transition: background-color 1s;
 
 	.index-view {
-		/*-webkit-filter: blur(4px) saturate(1);
-		filter: blur(4px) saturate(1);*/
-		opacity: 0;
-
-		transition: opacity 0.25s, filter 0.5s, saturate 0.5s;
+		-webkit-filter: blur(4px) saturate(10);
+		filter: blur(4px) saturate(10);
    		-webkit-transform: translateZ(0);
    		-moz-transform: translateZ(0);
    		-ms-transform: translateZ(0);
@@ -115,6 +176,7 @@
 	}
 
 	.post-view {
+		//opacity: 1;		
 		display: block;
 		position: fixed;
 		top: 0;
@@ -128,7 +190,7 @@
     	-moz-box-sizing: border-box;
     	box-sizing: border-box;
     	margin-bottom: 50vh;
-    	background-color: rgba(255,255,255,0.5);
+    	//background-color: rgba(255,255,255,0.9);
 	}
 }
 
@@ -146,32 +208,3 @@
     
 }
 */
-
-.fade {
- 
-    opacity: 1;
-}
-.fade.ng-enter {
-    //-webkit-transition: all 0.5s ease;
-    //transition: all 0.5s ease;
-    //transform-origin: top;
-}
-
-.fade.ng-leave {
-
-}
-.fade.ng-enter {
-    opacity: 0;
-    transform: scale(0.75,0.75)
-}
-.fade.ng-enter-active {
-    opacity: 1;
-    transform: scale(1,1)
-}
-.fade.ng-leave {
-    opacity: 1;
-
-}
-.fade.ng-leave-active {
-    opacity: 0;
-}

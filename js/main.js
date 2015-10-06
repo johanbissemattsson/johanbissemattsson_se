@@ -1,4 +1,15 @@
-var app = angular.module('app', ['ui.router', 'ngSanitize', 'ngAnimate', 'angular-images-loaded']).controller('MainController');
+var app = angular.module('app', ['ui.router', 'ct.ui.router.extras', 'ngSanitize', 'ngAnimate', 'angular-images-loaded']).controller('MainController');
+
+app.directive('contentView', ['$templateCache', function($templateCache)
+{
+    return {
+        restrict: 'A',
+        compile:  function (element)
+        {
+            $templateCache.put('initialcontent.html', element.html());
+        }
+    };
+}])
 
 app.directive('indexView', ['$templateCache', function($templateCache)
 {
@@ -58,9 +69,16 @@ app.controller('MainController', ['$scope', '$rootScope', '$state', '$location',
         }, 100); //was 100
     });*/
 
-        $rootScope.$on('$stateChangeStart', 
-        function(event, toState, toParams, fromState, fromParams){
 
+/*$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState) {
+  if (toState.redirectTo) {
+    event.preventDefault();
+    $state.go(toState.redirectTo, toParams);
+  }
+});*/
+/*
+        $rootScope.$on('$stateChangeStart', 
+        function(event, toState, toParams, fromState, fromParams, $state){
 
             if (!stateStatusService.startState()) {
                 if (toState.name == 'index') {
@@ -71,28 +89,63 @@ app.controller('MainController', ['$scope', '$rootScope', '$state', '$location',
             }
 
             if (toState.name == 'index') {
+                if (!stateStatusService.indexInitialized()) {
+                    if (toState.redirectTo) {
+                        event.preventDefault();
+                        $state.go(toState.redirectTo, toParams);                
+                    }
+                }
+            }
+*/
+
+/*
+            if (toState.name == 'index') {
                 event.preventDefault();
                 if(stateStatusService.indexInitialized()) {
-                    stateStatusService.dataFromJSON(true);                    
-                    $state.go('index.load');
+                    stateStatusService.dataFromJSON(true);
+                    console.log("holabandola");                    
                 } else {
                     stateStatusService.dataFromJSON(true);
+                    stateStatusService.indexInitialized(true);
                     $state.go('index.init');                 
                 }
             }
+
+*/
             //console.log("set saveScroll temporarily false");
             //stateStatusService.saveScroll(false);
+    //    });
+
+/*
+        $rootScope.$on('$locationChangeStart', 
+        function(event, newUrl, oldUrl, newState, oldState){
+
+            console.log(newUrl);
+
         });
 
+*/
         $rootScope.$on('$stateChangeSuccess',
         function(event, toState, toParams, fromState, fromParams ) {
             if (toState.name == "post") {
-                $('body').removeClass('index').addClass('post');
+                $('body').removeClass('index').addClass('single');
             } else {
-                $('body').removeClass('post').addClass('index');                
+                $('body').removeClass('single').addClass('index');                
             }
-
         });
+
+            /*
+            if (toState.name == "post") {
+                $('body').removeClass('index').addClass('post', function(event) {
+                    console.log("hej");
+                });
+            } else {
+                $('body').removeClass('post').addClass('index', function(event) {
+                    console.log("svejs");
+                });                
+            }
+            */            
+
 
         $scope.imgLoadedEvents = {
             always: function(instance) {
@@ -137,6 +190,89 @@ app.controller('MainController', ['$scope', '$rootScope', '$state', '$location',
 
 }]);
 
+app.run(function($rootScope, $state, $location, stateStatusService) {
+
+    $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
+        if (toState.name == 'index') {
+            document.querySelector('title').innerHTML = 'Johan Bisse Mattsson';            
+        }
+    });
+
+    /*
+    $rootScope.$on('$stateChangeStart', function(evt, to, params) {
+            if (!stateStatusService.indexInitialized()) {
+      
+      if (to.redirectTo) {
+        evt.preventDefault();
+        $state.go(to.redirectTo, params)
+      }
+  }
+    });
+
+
+        $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
+            console.log("Current toState is..." + toState.name);
+        });    
+*/
+
+    /* -----
+    $rootScope.$on('$locationChangeStart', function(event, newUrl, oldUrl) {
+        console.log($location.path());
+
+        // lägg till startstate koll innan!
+        if ($location.path() == "/") {
+            if (stateStatusService.indexInitialized()) {
+                //event.preventDefault();
+                console.log("STOPP och BELÄGG!");
+            } else {
+                console.log("index.init!!!!!");
+                event.preventDefault();                
+                //stateStatusService.indexInitialized(true);
+                $state.go("index.init");
+            }
+        }
+    });
+
+
+    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState) {
+        if (!stateStatusService.startState()) {
+            if (toState.name == 'index') {
+                console.log("initialize index");
+                stateStatusService.indexInitialized(true);
+            }
+            stateStatusService.startState(toState.name);
+            console.log("Start state is... " + stateStatusService.startState());
+        }
+        console.log("hej :" + toState.name);
+    });
+
+        $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
+            console.log("Current toState is..." + toState.name);
+        });
+
+
+        -------*/
+
+        /*
+        if (toState.name == 'index') {
+            if (!stateStatusService.indexInitialized()) {
+                if (toState.redirectTo) {
+                    stateStatusService.indexInitialized(true);
+                    console.log("redirect");
+                    event.preventDefault();
+                    $state.go(toState.redirectTo, toParams);                
+                }
+            } else {
+                event.preventDefault();                
+                console.log("else");
+            }
+        }
+        */   
+    //});
+})
+
+
+
 app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlMatcherFactoryProvider, stateStatusService) {
     $locationProvider.html5Mode(true);
 
@@ -144,18 +280,8 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
 
     $stateProvider
     .state('index', {
-        url: '/' // Redirect to index.init and index.load is made in stateChangeStart
-    })
-
-    .state('index.load', {
-        resolve: {
-            tempIndexLoadResolveFunction: function (stateStatusService) {
-                console.log("Index Load funkar!!!!!!! snurra uppe till vänster!");
-            }            
-        }
-    })    
-
-    .state('index.init', {
+        url: '/',
+        sticky: true,
         resolve: {
             indexTemplateCacheOrInitialContent: function ($templateRequest, stateStatusService) {                
                 if(stateStatusService.dataFromJSON()) {
@@ -169,12 +295,10 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
             promiseObj: function ($stateParams, resourceCache, stateStatusService, wpService) {
                 if (stateStatusService.dataFromJSON()) {
                     //stateStatusService.indexInitialized(true);                                        
-                    console.log("hej");
+                    stateStatusService.indexInitialized(true);                                        
                     return wpService.getIndex();
                     return wpService;                                    
                 } else {
-                    console.log("Set data from json true");
-                    console.log("2");                    
                     stateStatusService.dataFromJSON(true);
                     stateStatusService.indexInitialized(true);                    
                 } 
@@ -193,6 +317,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
 
     .state('post', {
         url: '/:slug/',
+        sticky: 'true',
         resolve: {
             postTemplateCacheOrInitialContent: function ($templateRequest, stateStatusService) {
                 if(stateStatusService.dataFromJSON()) {
@@ -209,7 +334,6 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
                     return wpService;
                 } else {
                     console.log("initDataFromJSON (post state)");
-                    console.log("3");                    
                     stateStatusService.dataFromJSON(true);
                 } 
                 return;
@@ -225,6 +349,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
         }
     });  
 });
+
 
 /*
     $stateProvider
@@ -338,7 +463,6 @@ app.factory('wpService', ['$http', '$q', '$stateParams', 'resourceCache', functi
                 angular.forEach(resindex, function(postvalue, postkey) {
                     if(resindex[postkey].title == 'Home') {
                         wpService.home = resindex[postkey];
-                        document.querySelector('title').innerHTML = 'Johan Bisse Mattsson';                        
                     } else if(resindex[postkey].slug == $stateParams.slug) {
                         wpService.posts = resindex[postkey];
                     }
