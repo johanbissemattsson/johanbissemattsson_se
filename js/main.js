@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ui.router', 'ct.ui.router.extras', 'ngSanitize', 'ngAnimate', 'angular-images-loaded']).controller('MainController');
+var app = angular.module('app', ['ui.router', 'ct.ui.router.extras', 'ngSanitize', 'angular-images-loaded']).controller('MainController');
 
 app.directive('contentView', ['$templateCache', function($templateCache)
 {
@@ -125,14 +125,29 @@ app.controller('MainController', ['$scope', '$rootScope', '$state', '$location',
         });
 
 */
-        $rootScope.$on('$stateChangeSuccess',
+
+        // ------------------
+        // FLYTTA TILL RESOLVE?????? KOLLA STATE! KÖRS ANNARS FLERA GGR.
+        // ------------------
+/*
+        $scope.$on('$viewContentLoaded',
+        function(event, stateStatusService) {
+            if ($location.path() == '/') {
+                $('body').removeClass('single').addClass('index');                
+            } else {
+                $('body').removeClass('index').addClass('single');
+                stateStatusService.indexInitialized(true);            
+            }
+        });
+*/
+        /*$rootScope.$on('$stateChangeSuccess',
         function(event, toState, toParams, fromState, fromParams ) {
             if (toState.name == "post") {
                 $('body').removeClass('index').addClass('single');
             } else {
                 $('body').removeClass('single').addClass('index');                
             }
-        });
+        });*/
 
             /*
             if (toState.name == "post") {
@@ -194,9 +209,12 @@ app.run(function($rootScope, $state, $location, stateStatusService) {
 
     $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
         if (toState.name == 'index') {
-            document.querySelector('title').innerHTML = 'Johan Bisse Mattsson';            
+            document.querySelector('title').innerHTML = 'Johan Bisse Mattsson';
+            $('body').removeClass('single').addClass('index');
         }
     });
+
+
 
     /*
     $rootScope.$on('$stateChangeStart', function(evt, to, params) {
@@ -311,13 +329,15 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
                     return indexTemplateCacheOrInitialContent;
                 },
                 controller: 'IndexController'           
+            },
+            'postView@': {
+                template: '</ui-view>'
             }
         }
     })             
 
     .state('post', {
         url: '/:slug/',
-        sticky: 'true',
         resolve: {
             postTemplateCacheOrInitialContent: function ($templateRequest, stateStatusService) {
                 if(stateStatusService.dataFromJSON()) {
@@ -442,6 +462,12 @@ app.controller('PostController', ['$scope','promiseObj', function($scope, promis
     if(promiseObj) {
         $scope.data = promiseObj;       
     }
+        $scope.$on('$viewContentLoaded',
+        function(event) {
+                $('body').removeClass('index').addClass('single');
+            }
+        );
+
 }]);
 
 app.factory("resourceCache",["$cacheFactory",

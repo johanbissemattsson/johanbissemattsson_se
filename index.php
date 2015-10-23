@@ -55,7 +55,7 @@ get_header(); ?>
 						
 				</div>
 			</div>
-
+			<div class="overlay"></div>
 			<div class="post-view" post-view ui-view="postView" autoscroll="false"></div>
 
 		</main><!-- #main -->
