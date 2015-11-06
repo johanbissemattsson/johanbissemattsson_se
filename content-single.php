@@ -8,10 +8,16 @@
 				<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
 
 				<?php if ( get_field('entry_details')): ?>
-					<div class="entry-details">
+					<span class="entry-details">
 						<?php the_field('entry_details'); ?>
-					</div>
+					</span>
 				<?php endif; ?>
+
+				<?php if ( has_post_thumbnail()): ?>
+					<div class="featured-image">
+						<?php the_post_thumbnail(); ?>
+					</div>
+				<?php endif; ?>				
 
 			</header><!-- .entry-header -->
 

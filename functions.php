@@ -84,18 +84,14 @@ add_action( 'after_setup_theme', 'johanbissemattsson_setup' );
 function johanbissemattsson_scripts() {
 	wp_enqueue_style( 'johanbissemattsson-style', get_stylesheet_uri() );
 
-	//wp_enqueue_script( 'johanbissemattsson-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20120206', true );
-
-	wp_enqueue_script( 'johanbissemattsson-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20130115', true );
-
-	wp_enqueue_script( 'johanbissemattsson-scripts', get_template_directory_uri() . '/js/main-dist.js', array('jquery', 'isotope', 'images-loaded', 'angular-images-loaded', 'angularjs', 'angularjs-uirouter', 'angularjs-uirouter-extras', 'angularjs-sanitize', 'angularjs-animate'),'1.0', true );
+	wp_enqueue_script( 'johanbissemattsson-scripts', get_template_directory_uri() . '/js/main-dist.js', array('jquery', 'angularjs', 'angularjs-uirouter', 'angularjs-uirouter-extras', 'angularjs-sanitize', 'angularjs-animate', 'gsap-tweenlite'),'1.0', true );
 
 	wp_deregister_script( 'jquery' );
 	wp_register_script( 'jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js', array(), '1.11.3', true );
 
 	wp_register_script( 'jquery-ui', get_template_directory_uri() . 'js/vendor/jquery-ui.min.js', array('jquery') );
 
-	wp_register_script( 'angularjs', get_template_directory_uri() . '/js/vendor/angular.js', array('jquery', 'isotope' ));
+	wp_register_script( 'angularjs', get_template_directory_uri() . '/js/vendor/angular.js', array('jquery') );
 
 	wp_register_script( 'angularjs-uirouter', get_template_directory_uri() . '/js/vendor/angular-ui-router.min.js', array('jquery', 'angularjs'));
 
@@ -105,11 +101,8 @@ function johanbissemattsson_scripts() {
 
 	wp_register_script( 'angularjs-animate', '//ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular-animate.js', array('jquery', 'angularjs'));
 
-	wp_register_script( 'isotope', '//cdnjs.cloudflare.com/ajax/libs/jquery.isotope/2.2.0/isotope.pkgd.min.js', array('jquery'), '2.2.0', true );
+	wp_register_script( 'gsap-tweenlite', get_template_directory_uri() . '/js/vendor/gsap/minified/TweenLite.min.js', array('jquery', 'angularjs'));
 
-	wp_register_script( 'images-loaded', 'https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/3.1.8/imagesloaded.pkgd.min.js', array('jquery', 'isotope'));
-
-	wp_register_script( 'angular-images-loaded', get_template_directory_uri() . '/js/vendor/angular-images-loaded.js' , array('jquery', 'angularjs', 'isotope', 'images-loaded'));
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );

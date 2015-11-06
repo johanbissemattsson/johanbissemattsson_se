@@ -6,10 +6,6 @@ h1, h2, h3, h4, h5, h6 {
 	}
 }
 
-h1, .entry-details {
-	text-align: center;
-}
-
 .site-title {
 	position: fixed;
 	top: 0;
@@ -21,6 +17,8 @@ h1, .entry-details {
 }
 
 .entry-header {
+	text-align: center;
+
 	a {
 		text-decoration: none;
 		display: block;
@@ -30,10 +28,31 @@ h1, .entry-details {
 .grid-item {
 	h1 {
 		font-size: $font__size-grid-item-h1;
-		margin: 0;
+		display: inline-block;
+	}
+
+	a {
+		text-decoration: none;
 	}
 
 	.entry-details {
 		font-size: $font__size-grid-item-entry-details;
+	}
+}
+
+.post {
+
+	.entry-header {
+
+		h1 {
+			margin-bottom: 0.5em;
+		}
+
+		.entry-details {
+			font-size: $font__size-single-entry-details;
+			display: block;
+			margin-bottom: 2em;
+		}
+
 	}
 }

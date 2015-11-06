@@ -14,9 +14,9 @@
 
 				<?php if ( 'post' == get_post_type() ) : ?>
 					<?php if(get_field('entry_details')): ?>
-						<div class="entry-details">
+						<span class="entry-details">
 							<?php the_field('entry_details'); ?>
-						</div>
+						</span>
 					<?php endif; ?>
 
 				<?php endif; ?>

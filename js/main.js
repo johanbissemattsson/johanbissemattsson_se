@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ui.router', 'ct.ui.router.extras', 'ngSanitize', 'angular-images-loaded']).controller('MainController');
+var app = angular.module('app', ['ui.router', 'ct.ui.router.extras', 'ngSanitize']).controller('MainController');
 
 app.directive('contentView', ['$templateCache', function($templateCache)
 {
@@ -50,8 +50,8 @@ app.directive('onLastRepeat', function() {
 });
 
 app.run(function($templateCache, $http, resourceCache) {
-    $templateCache.put('indexview.html', '<div class="site-description" ng-bind-html="data.home.content"></div><div class="grid effect" images-loaded="imgLoadedEvents"><div class="grid-sizer"></div><div class="gutter-sizer"></div><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{postitem.link}}" rel="bookmark"><img ng-src="{{postitem.featured_image.source}}" width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" alt="{{postitem.title}}"><h1 class="entry-title">{{postitem.title}}</h1><div class="entry-details">{{postitem.acf.entry_details}}</div></a></div>');
-    $templateCache.put('postview.html', '<article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><div class="entry-details">{{data.post.acf.entry_details}}</div></header><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
+    $templateCache.put('indexview.html', '<div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{postitem.link}}" rel="bookmark"><img ng-src="{{postitem.featured_image.source}}" width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" alt="{{postitem.title}}"><h1 class="entry-title">{{postitem.title}}</h1><span class="entry-details">{{postitem.acf.entry_details}}</span></a></div>');
+    $templateCache.put('postview.html', '<article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><span class="entry-details">{{data.post.acf.entry_details}}</span><div class="featured-image"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}" alt="{{data.post.title}}"></div></header><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
     $http.get('wp-content/uploads/json/sitedata.json', {cache: resourceCache });
 });
 
@@ -161,28 +161,6 @@ app.controller('MainController', ['$scope', '$rootScope', '$state', '$location',
             }
             */            
 
-
-        $scope.imgLoadedEvents = {
-            always: function(instance) {
-                // Do stuff
-            },
-            done: function(instance) {
-                angular.element(instance.elements[0]).addClass('loaded');
-                var iso = new Isotope( '.grid', {
-                    percentPosition: "true",
-                    itemSelector: '.grid-item',
-                    layoutMode: 'masonry',
-                    transitionDuration: '0',
-                    masonry: {
-                        columnWidth: '.grid-sizer',
-                        gutter: '.gutter-sizer'
-                    }
-                });
-            },
-            fail: function(instance) {
-                // Do stuff
-            }
-        };
 /*
         //Keep scroll position
             $(window).on('scroll', function() {

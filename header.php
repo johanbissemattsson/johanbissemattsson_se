@@ -23,7 +23,6 @@
 <body class="single">
 <?php } ?>
 <div id="page" class="hfeed site">
-	<a class="skip-link screen-reader-text" href="#content"><?php _e( 'Skip to content', 'johanbissemattsson' ); ?></a>
 
 	<?php if ( is_front_page() ) { ?>
 	<header id="masthead" class="site-header" role="banner">

@@ -25,9 +25,7 @@ get_header(); ?>
 					?>
 				</div>
 
-				<div class="grid effect" images-loaded="imgLoadedEvents">
-					<div class="grid-sizer"></div>
-					<div class="gutter-sizer"></div>
+				<div class="grid">
 					
 					<?php 		
 					// WP_Query arguments
