@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ui.router', 'ct.ui.router.extras', 'ngSanitize']).controller('MainController');
+var app = angular.module('app', ['ui.router', 'ct.ui.router.extras', 'ngSanitize', 'ngAnimate']).controller('MainController');
 
 app.directive('contentView', ['$templateCache', function($templateCache)
 {
@@ -177,22 +177,124 @@ app.controller('MainController', ['$scope', '$rootScope', '$state', '$location',
             $scope.currentPath = $location.path();
             if ($scope.currentPath =='/') {
                 stateStatusService.scrollPos(0);
-                $('html,body').animate({ scrollTop: 0}, 500);    
+                TweenMax.to(window, 0.5, {scrollTo:{y:0}, ease:Power2.easeOut});
             }        
         }        
 
 }]);
 
+
+/*
+app.animation('.post-view', [function() {
+  
+  return {
+    enter: function(element, doneFn) {
+        TweenMax.fromTo(".single .post-view", 1, {opacity: 0, display: 'none'}, {opacity: 1, display: 'block', onComplete: doneFn});
+       //TweenMax.fromTo(".index .post-view", 0.5, {opacity: 1, display: 'block'}, {opacity: 0, display: 'none', onComplete: doneFn});         
+        console.log("enter");          
+    }
+  }
+}]);
+
+*/
+
+/*
+app.animation('.post-view', [function() {
+  return {
+    enter: function(element, doneFn, stateStatusService) {
+        TweenMax.fromTo(".post-view", 1.5, {opacity: 0, display: 'none'}, {opacity: 1, display: 'block', onComplete: doneFn}); 
+        console.log("enter");
+    }
+  }
+}]);
+*/
+/*
+app.animation('.index', [function() {
+  return {
+    enter: function(element, doneFn) {
+        TweenMax.fromTo(".post-view", 1.5, {opacity: 1, display: 'block'}, {opacity: 0, display: 'none', onComplete: doneFn}); 
+        console.log("enter");          
+    }
+  }
+}]);
+*/
+/*
+app.animation('.post-view', [function() {
+  return {
+    enter: function(element, doneFn, stateStatusService) {
+        TweenMax.to(".single.post-view", 4, {opacity: 1, display: 'block', onComplete: doneFn}); 
+        console.log("enter");            
+    },
+    enter: function(element, doneFn, stateStatusService) {
+        TweenMax.to(".index.post-view", 4, {opacity: 0, display: 'none', onComplete: doneFn}); 
+        console.log("enter");            
+    }    
+  }
+}]);
+*/
+
+///////////
+// Det är ju flera app.run i denna fil! SLÅ SAMMAN!
+
 app.run(function($rootScope, $state, $location, stateStatusService) {
+
+    //var siteTitleSplitText = new SplitText(".site-title", {type: "chars", position: "absolute", charsClass: "character"});
+    //console.log (siteTitleSplitText.chars);    
+    //var siteTitleTimeline = new TimelineMax();
 
     $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
         if (toState.name == 'index') {
             document.querySelector('title').innerHTML = 'Johan Bisse Mattsson';
-            $('body').removeClass('single').addClass('index');
+            var content = document.getElementById('content'); // Flytta till load            
+            var contentRectangle = content.getBoundingClientRect(); // Kopiera till skärmandring
+            TweenMax.to(".site-title", 1, {x: contentRectangle.left, y: 12, ease: Elastic.easeOut});
+            //TweenMax.staggerTo(siteTitleSplitText.chars, 1, {x: 0, y: 0, ease: Elastic.easeOut}, 0.005);
+            //siteTitleTimeline.to(".site-title", 1, {left:100}).to(".site-title", 1, {top:50}).to(".site-title", 1, {opacity:0.1});
+            //TweenMax.to("article", 1, {backgroundColor: "#ffccff"});
+
+
+        } else if (toState.name == 'post') {
+            TweenMax.to(".site-title", 1, {color:"#00ff00"});
+            TweenMax.to(".site-title", 1, {x: 0, y: -32, ease: Elastic.easeOut});
+            //TweenMax.to("article", 1, {backgroundColor: "#ffccff"});
+
+
+            //TweenMax.staggerTo(siteTitleSplitText.chars, 1, {x: 0, y: 0, ease: Elastic.easeOut}, 0.005);
+            //siteTitleTimeline.to(".site-title", 1, {left:0}).to(".site-title", 1, {top:0}).to(".site-title", 1, {opacity:1});
+
+
         }
     });
+/*
+    $rootScope.$on('$viewContentLoaded',function(event, viewConfig){
+        if(stateStatusService.fadeOutPostView() == true) {
+            stateStatusService.fadeOutPostView(false);
 
+            console.log("hola que tal");
+        }
+    });
+*/
+   // $rootScope.$on('$viewContentLoaded',function(event, viewConfig){
+     //   if(stateStatusService.postViewReadyForAnimation() == true) {
+       //     console.log("JGOENOGNEO");
+        //};
+        /*if($state.current.name == "index") {
+            if (hasAnimatedIndex != true) {
+                hasAnimatedIndex = true;
+            } else {
 
+                console.log("har redan animareat index");
+            }
+        } else {
+            if (hasAnimatedPost != true) {
+                console.log("har redan aaqa post ");
+                hasAnimatedPost = true;
+            } else {
+                console.log("har redan animareat post ");
+            }
+        };*/
+       // TweenMax.fromTo(".post-view article", 0.5, {backgroundColor: "rgba(255,255,255,0)"}, {backgroundColor: "rgba(255,255,255,1)"});
+   // });
 
     /*
     $rootScope.$on('$stateChangeStart', function(evt, to, params) {
@@ -265,9 +367,7 @@ app.run(function($rootScope, $state, $location, stateStatusService) {
         }
         */   
     //});
-})
-
-
+});
 
 app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlMatcherFactoryProvider, stateStatusService) {
     $locationProvider.html5Mode(true);
@@ -308,14 +408,20 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
                 },
                 controller: 'IndexController'           
             },
+
+        }
+    })
+    .state('index.animationFinished', {
+        views: {
             'postView@': {
                 template: '</ui-view>'
             }
         }
-    })             
+    })           
 
     .state('post', {
         url: '/:slug/',
+        sticky: true,
         resolve: {
             postTemplateCacheOrInitialContent: function ($templateRequest, stateStatusService) {
                 if(stateStatusService.dataFromJSON()) {
@@ -345,9 +451,20 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
                 controller: 'PostController'           
             }
         }
-    });  
+    });
 });
 
+/*
+app.animation('.post-view', [function() {
+  return {
+    enter: function(element, doneFn) {
+            //TweenMax.to(".post-view article", 0.5, {backgroundColor: "#bbccdd"});
+            TweenMax.fromTo(".post-view article", 0.5, {backgroundColor: "rgba(255,255,255,0)"}, {backgroundColor: "rgba(255,255,255,1)"});
+            console.log("enter");
+            console.log($scope);          
+    }
+  }
+}]);*/
 
 /*
     $stateProvider
@@ -430,22 +547,56 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
 
 */
 
-app.controller('IndexController', ['$scope', 'promiseObj', '$timeout', '$anchorScroll', 'stateStatusService', function($scope, promiseObj, $timeout, $anchorScroll, stateStatusService) {
+/*
+// 1.4+
+ngModule.controller('MyController', ['$animate', function($animate){
+  $animate.on('enter', ngViewElement, function() {
+    // the page is ready!
+  });
+}])
+*/
+/*
+app.animation(".post-view", function() {
+    return {
+        enter: function (element, done) {
+            $('body').removeClass('single').addClass('index');
+        }
+    }
+});
+*/
+
+app.controller('IndexController', ['$scope', 'promiseObj', '$state', '$timeout', '$anchorScroll', 'stateStatusService', function($scope, promiseObj, $state, $timeout, $anchorScroll, stateStatusService) {
     if(promiseObj) {
         $scope.data = promiseObj;       
     };
+
+
+    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
+        if (fromState.name == "post" && toState.name == "index") {
+            $('body').removeClass('single').addClass('index');
+            TweenMax.to(".post-view article", 0.25, {opacity: 0, onComplete: doneFn});            
+        }
+    });
+
+    function doneFn(event) {
+        $state.go("index.animationFinished");
+        console.log("index.animationFinished");
+    }
+
 }]);
 
-app.controller('PostController', ['$scope','promiseObj', function($scope, promiseObj) {
+app.controller('PostController', ['$scope','promiseObj', '$state', function($scope, promiseObj, $state) {
     if(promiseObj) {
         $scope.data = promiseObj;       
     }
-        $scope.$on('$viewContentLoaded',
-        function(event) {
-                $('body').removeClass('index').addClass('single');
-            }
-        );
 
+    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
+        if ((fromState.name == "index" || fromState.name == "index.animationFinished") && toState.name == "post") {
+            $('body').removeClass('index').addClass('single');
+            TweenMax.fromTo(".post-view article", 0.25, {opacity: 1, backgroundColor: "rgba(255,255,255,0)"}, {backgroundColor: "rgba(255,255,255,1)"});
+            console.log("post");
+        }
+    });
 }]);
 
 app.factory("resourceCache",["$cacheFactory",
@@ -503,12 +654,14 @@ app.factory('wpService', ['$http', '$q', '$stateParams', 'resourceCache', functi
 
 app.service('stateStatusService', function () {
     var stringStartState;
+    var stringCurrentState;
     var boolDataFromJSON = false;
     var boolIndexLoaded = false;
     var boolSaveScroll = true;    
     var intScrollPos = 0;
     var boolStringInitialized = false;
     var varrenameThis = 0;
+    var boolfadeOutPostView = false;
 
     return {
         startState: function (value) {
@@ -566,7 +719,23 @@ app.service('stateStatusService', function () {
             } else {
                 return varrenameThis;
             }
-        }
+        },
+        currentState: function (value) {
+            if (value) {
+                stringCurrentState = value;
+                return;
+            } else {
+                return stringCurrentState;
+            }
+        },
+        fadeOutPostView: function (value) {
+            if (value) {
+                boolfadeOutPostView = value;
+                return;
+            } else {
+                return boolfadeOutPostView;
+            }
+        }        
     }
 });
 

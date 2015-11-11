@@ -16,8 +16,7 @@ get_header(); ?>
 		<main id="main" class="site-main" role="main">
 
 			<div class="index-view" index-view ui-view="indexView" autoscroll="false"></div>
-			<div class="overlay"></div>					
-			<div class="post-view" post-view ui-view="postView" autoscroll="false">
+			<div class="post-view" post-view ui-view="postView" autoscroll="false" ng-class="active">
 				<?php while ( have_posts() ) : the_post(); ?>
 
 					<?php get_template_part( 'content', 'page' ); ?>

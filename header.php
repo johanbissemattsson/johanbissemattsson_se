@@ -30,7 +30,7 @@
 	<header id="masthead" class="site-header minified" role="banner">
 	<?php } ?>
 		<div class="site-branding">
-			<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home" ng-click="gotoTop()"><?php bloginfo( 'name' ); ?></a></h1>
+			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home" ng-click="gotoTop()"><h1 class="site-title"><?php bloginfo( 'name' ); ?></h1></a>
 		</div><!-- .site-branding -->
 	</header><!-- #masthead -->
 

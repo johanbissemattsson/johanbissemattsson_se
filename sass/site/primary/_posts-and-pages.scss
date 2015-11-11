@@ -99,18 +99,26 @@
 }
 
 .post-view {
-	display: none;
-	transition: background-color 1s;
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 9000;
+	article {
+		display: block;
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 9000;
+		overflow-y: scroll;
+		-webkit-overflow-scrolling: touch;
+		-webkit-box-sizing: border-box;
+    	-moz-box-sizing: border-box;
+    	box-sizing: border-box;
+    	background-color: #fff;
+	}
 }
 
 .index {
 	.post-view {
+			//opacity: 0;
 			pointer-events: none;		
 	}
 }
@@ -164,40 +172,14 @@
 }
 */
 
-.overlay {
-	transition: background 0.5s;
-	-webkit-transform: translate3d(0, 0, 0);	
-	pointer-events: none;
-}
-
 .index {
 	.post-view {
 		//display: none;
 		//opacity: 0;
 		//pointer-events: none;
 	}
-	.overlay {
-		background: none;
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;		
-		height: 100%;
-		z-index: 1000;
-	}	
 }
 
-.single {
-	.overlay {
-		background-color: #fff;
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;		
-		height: 100%;
-		z-index: 1000;
-	}
-}
 // Turn off background body scrolling when showing single posts
 .single {
 	overflow-x: hidden;
@@ -205,40 +187,16 @@
 	//background-color: #fff;
     //transition: background-color 1s;
 
-	.index-view {
-		//opacity: 0;
-		//-webkit-filter: blur(4px);
-   		/*-webkit-transform: translateZ(0);
-   		-moz-transform: translateZ(0);
-   		-ms-transform: translateZ(0);
-   		-o-transform: translateZ(0);
-   		transform: translateZ(0);		*/
-		/*-webkit-filter: blur(4px) saturate(10);
-		filter: blur(4px) saturate(10);
-   		-webkit-transform: translateZ(0);
-   		-moz-transform: translateZ(0);
-   		-ms-transform: translateZ(0);
-   		-o-transform: translateZ(0);
-   		transform: translateZ(0);*/
-   		//opacity: 0;
-	}
-
-	.post-view {
-		display: block;
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: 9000;
-		overflow-y: scroll;
-		-webkit-overflow-scrolling: touch;
-		-webkit-box-sizing: border-box;
-    	-moz-box-sizing: border-box;
-    	box-sizing: border-box;
-    	margin-bottom: 50vh;
+	.site-title {
+		.character {
+			position: fixed !important;
+			left: 0 !important;
+			transition: 0.25s;
+		}
 	}
 }
+
+
 
 /*
 .slideup {

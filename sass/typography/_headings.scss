@@ -9,11 +9,14 @@ h1, h2, h3, h4, h5, h6 {
 .site-title {
 	position: fixed;
 	top: 0;
-	left: 32px;
+	left: 26px;
 	z-index: 10000;
-	text-align: left;
-	opacity: 0.1;
-	letter-spacing: -0.33em;
+	font-size: 3em;
+	font-size: 5vw;
+
+	:focus {
+		outline: none;
+	}
 }
 
 .entry-header {
