@@ -570,18 +570,29 @@ app.controller('IndexController', ['$scope', 'promiseObj', '$state', '$timeout',
         $scope.data = promiseObj;       
     };
 
+    var tlGotoIndex = new TimelineMax({paused: true, onComplete: onGotoIndexCompleted});
+        tlGotoIndex.add(TweenMax.set("body", {className:"index"}));
+        tlGotoIndex.add(TweenMax.fromTo("article", 5, {opacity: 1} ,{opacity: 0}));
+
+    function onGotoIndexCompleted(event) {
+        $state.go("index.animationFinished");
+        console.log("index.animationFinished");      
+    }
 
     $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
         if (fromState.name == "post" && toState.name == "index") {
-            $('body').removeClass('single').addClass('index');
-            TweenMax.to(".post-view article", 0.25, {opacity: 0, onComplete: doneFn});            
+            tlGotoIndex.play();
+
+            //$('body').removeClass('single').addClass('index');
+            //TweenMax.to(".post-view article", 0.5, {opacity: 0, onComplete: doneFn});            
         }
     });
-
+/*
     function doneFn(event) {
         $state.go("index.animationFinished");
         console.log("index.animationFinished");
     }
+*/
 
 }]);
 
@@ -590,10 +601,15 @@ app.controller('PostController', ['$scope','promiseObj', '$state', function($sco
         $scope.data = promiseObj;       
     }
 
+    var tlGotoPost = new TimelineMax({paused: true});
+        tlGotoPost.add(TweenMax.set("body", {className:"single"}));
+        tlGotoPost.add(TweenMax.fromTo(".post-view article", 0.5, {backgroundColor: "rgba(255,255,255,0)"}, {backgroundColor: "rgba(255,255,255,1)"}));    
+
     $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
         if ((fromState.name == "index" || fromState.name == "index.animationFinished") && toState.name == "post") {
-            $('body').removeClass('index').addClass('single');
-            TweenMax.fromTo(".post-view article", 0.25, {opacity: 1, backgroundColor: "rgba(255,255,255,0)"}, {backgroundColor: "rgba(255,255,255,1)"});
+            //$('body').removeClass('index').addClass('single');
+            tlGotoPost.play();
+            //TweenMax.fromTo(".post-view article", 0.5, {opacity: 1, backgroundColor: "rgba(255,255,255,0)"}, {backgroundColor: "rgba(255,255,255,1)"});
             console.log("post");
         }
     });
