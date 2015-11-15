@@ -58,6 +58,75 @@ app.run(function($templateCache, $http, resourceCache) {
 app.controller('MainController', ['$scope', '$rootScope', '$state', '$location', '$timeout', '$anchorScroll', 'stateStatusService',
     function($scope, $rootScope, $state, $location, $timeout, $anchorScroll, stateStatusService) {
 
+    /*
+    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
+        if (fromState.name == "post" && toState.name == "index") {
+            TweenMax.to(".post-view article", 0.5, {autoAlpha: 0, onComplete: onFadeoutCompleted});
+        } else if ((fromState.name == "index" || fromState.name == "index.animationFinished") && toState.name == "post") {
+            TweenMax.killTweensOf(".post-view article");
+            TweenMax.fromTo(".post-view article", 1, {autoAlpha: 0}, {autoAlpha: 1});
+        }
+
+
+    });
+
+        function onFadeoutCompleted(event) {
+            console.log("Fadeout animation has finished");              
+            $state.go("index.animationFinished");
+        }
+    */
+/*  
+    var tl = new TimelineMax({onComplete: onTimelineCompleted});
+
+    var tlFadeinPost = new TimelineMax({onStart: onFadeinStart, paused: true});
+        tlFadeinPost.to(".post-view article", 1, {autoAlpha: 1});
+
+    var tlFadeoutPost = new TimelineMax({onStart: onFadeoutStart, paused: true});
+        tlFadeoutPost.to(".post-view article", 1, {autoAlpha: 0, onComplete: onFadeoutCompleted});        
+
+
+    $scope.$on('$viewContentLoaded', function (event) {
+        console.log(stateStatusService.currentState());
+    });
+
+
+    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
+
+        if (fromState.name == "post" && toState.name == "index") {
+            stateStatusService.currentState(toState.name);
+            tl.clear();
+            tl.add(tlFadeoutPost.play());
+
+        } else if ((fromState.name == "index" || fromState.name == "index.animationFinished") && toState.name == "post") {
+            tl.clear();
+            tl.add(tlFadeinPost.play());
+        }
+    });
+
+    function onFadeinStart(event) {
+        console.log("onFadeinStart");
+        TweenMax.set("body", {className: "single"});        
+    }
+
+    function onFadeinCompleted(event) {
+        console.log("Fadein animation has finished");              
+    }    
+
+    function onFadeoutStart(event) {
+        console.log("onFadeoutStart");
+        TweenMax.set("body", {className: "index"});
+    }
+
+    function onFadeoutCompleted(event) {
+        console.log("Fadeout animation has finished");              
+        $state.go("index.animationFinished");
+    }
+
+    function onTimelineCompleted(event) {
+        console.log("onTimelineCompleted");      
+    }
+*/
+
     /*$scope.$on('$routeChangeStart', function() {
             $scope.okSaveScroll = false;
         });
@@ -570,29 +639,12 @@ app.controller('IndexController', ['$scope', 'promiseObj', '$state', '$timeout',
         $scope.data = promiseObj;       
     };
 
-    var tlGotoIndex = new TimelineMax({paused: true, onComplete: onGotoIndexCompleted});
-        tlGotoIndex.add(TweenMax.set("body", {className:"index"}));
-        tlGotoIndex.add(TweenMax.fromTo("article", 5, {opacity: 1} ,{opacity: 0}));
-
-    function onGotoIndexCompleted(event) {
-        $state.go("index.animationFinished");
-        console.log("index.animationFinished");      
-    }
-
     $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
         if (fromState.name == "post" && toState.name == "index") {
-            tlGotoIndex.play();
-
-            //$('body').removeClass('single').addClass('index');
-            //TweenMax.to(".post-view article", 0.5, {opacity: 0, onComplete: doneFn});            
+        var tlFadeoutPost = new TimelineMax({});
+        tlFadeoutPost.to(".post-view article", 1, {autoAlpha: 0}); 
         }
     });
-/*
-    function doneFn(event) {
-        $state.go("index.animationFinished");
-        console.log("index.animationFinished");
-    }
-*/
 
 }]);
 
@@ -601,18 +653,12 @@ app.controller('PostController', ['$scope','promiseObj', '$state', function($sco
         $scope.data = promiseObj;       
     }
 
-    var tlGotoPost = new TimelineMax({paused: true});
-        tlGotoPost.add(TweenMax.set("body", {className:"single"}));
-        tlGotoPost.add(TweenMax.fromTo(".post-view article", 0.5, {backgroundColor: "rgba(255,255,255,0)"}, {backgroundColor: "rgba(255,255,255,1)"}));    
-
-    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
-        if ((fromState.name == "index" || fromState.name == "index.animationFinished") && toState.name == "post") {
-            //$('body').removeClass('index').addClass('single');
-            tlGotoPost.play();
-            //TweenMax.fromTo(".post-view article", 0.5, {opacity: 1, backgroundColor: "rgba(255,255,255,0)"}, {backgroundColor: "rgba(255,255,255,1)"});
-            console.log("post");
-        }
-    });
+    $scope.$on('$viewContentLoaded', function(event) {
+        console.log("svejs");
+        //TweenMax.set("body", {className: "single"});
+        var tlFadeinPost = new TimelineMax({});
+        tlFadeinPost.fromTo(".post-view article", 1,{autoAlpha: 0}, {autoAlpha: 1}); 
+    });        
 }]);
 
 app.factory("resourceCache",["$cacheFactory",
