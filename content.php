@@ -7,7 +7,7 @@
 
 			<a href="<?php the_permalink(); ?>" rel="bookmark">
 				<?php if ( has_post_thumbnail() ) {
-					the_post_thumbnail();
+					the_post_thumbnail(basename(get_permalink()) . '-thumbnail');
 				} ?>
 
 				<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>

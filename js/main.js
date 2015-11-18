@@ -50,13 +50,20 @@ app.directive('onLastRepeat', function() {
 });
 
 app.run(function($templateCache, $http, resourceCache) {
-    $templateCache.put('indexview.html', '<div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{postitem.link}}" rel="bookmark"><img ng-src="{{postitem.featured_image.source}}" width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" alt="{{postitem.title}}"><h1 class="entry-title">{{postitem.title}}</h1><span class="entry-details">{{postitem.acf.entry_details}}</span></a></div>');
+    $templateCache.put('indexview.html', '<div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{postitem.link}}" rel="bookmark"><img ng-src="{{postitem.featured_image.source}}" width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" alt="{{postitem.title}}" class="attachment-{{postitem.slug}}-thumbnail"><h1 class="entry-title">{{postitem.title}}</h1><span class="entry-details">{{postitem.acf.entry_details}}</span></a></div>');
     $templateCache.put('postview.html', '<article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><span class="entry-details">{{data.post.acf.entry_details}}</span><div class="featured-image"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}" alt="{{data.post.title}}"></div></header><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
     $http.get('wp-content/uploads/json/sitedata.json', {cache: resourceCache });
 });
 
 app.controller('MainController', ['$scope', '$rootScope', '$state', '$location', '$timeout', '$anchorScroll', 'stateStatusService',
     function($scope, $rootScope, $state, $location, $timeout, $anchorScroll, stateStatusService) {
+
+    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
+        if (!stateStatusService.startState()) {
+            stateStatusService.startState(toState.name);
+            console.log("Start state is: " + stateStatusService.startState());
+        }
+    });
 
     /*
     $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
@@ -459,7 +466,6 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
             },
             promiseObj: function ($stateParams, resourceCache, stateStatusService, wpService) {
                 if (stateStatusService.dataFromJSON()) {
-                    //stateStatusService.indexInitialized(true);                                        
                     stateStatusService.indexInitialized(true);                                        
                     return wpService.getIndex();
                     return wpService;                                    
@@ -641,24 +647,70 @@ app.controller('IndexController', ['$scope', 'promiseObj', '$state', '$timeout',
 
     $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
         if (fromState.name == "post" && toState.name == "index") {
-        var tlFadeoutPost = new TimelineMax({});
-        tlFadeoutPost.to(".post-view article", 1, {autoAlpha: 0}); 
+            var tlFadeoutPost = new TimelineMax({onStart: onFadeoutStart, onComplete: onFadeoutComplete});
+            tlFadeoutPost.set(".post-view article", {overflow: "hidden"});         
+            tlFadeoutPost.set("body", {className: "index"}); 
+            tlFadeoutPost.set(".post-view article", {backgroundColor: "rgba(255,255,255, 0)"});         
+
+            tlFadeoutPost.to(".post-view article", 0.33, {autoAlpha: 0});
         }
     });
 
+    function onFadeoutStart(event) {
+
+    }
+
+    function onFadeoutComplete(event) {
+        $state.go("index.animationFinished");
+
+    }
+
 }]);
 
-app.controller('PostController', ['$scope','promiseObj', '$state', function($scope, promiseObj, $state) {
+app.controller('PostController', ['$scope', 'promiseObj', '$state', 'stateStatusService', function($scope, promiseObj, $state, stateStatusService) {
     if(promiseObj) {
         $scope.data = promiseObj;       
     }
 
+    console.log($state.current);
+
+    if (stateStatusService.startState() == "post") {
+        console.log("hej");
+    }
+
     $scope.$on('$viewContentLoaded', function(event) {
-        console.log("svejs");
-        //TweenMax.set("body", {className: "single"});
-        var tlFadeinPost = new TimelineMax({});
-        tlFadeinPost.fromTo(".post-view article", 1,{autoAlpha: 0}, {autoAlpha: 1}); 
-    });        
+        var tlFadeinPost = new TimelineMax({onStart: onFadeinStart, onComplete: onFadeinComplete});
+        tlFadeinPost.set(".featured-image, .entry-header, .entry-content", {autoAlpha: 0.25});
+
+
+        // Tänk på att index inte alltid finns - därför kan den vara undefied
+
+        var postOriginalThumbnail = ".attachment-" + "avstandets-bla" + "-thumbnail";
+
+        var postThumbnail = {
+            src: $(postOriginalThumbnail).attr('src'),
+            x: 3,
+            y: 3,
+            width: 3,
+            height: 3,
+
+        }
+
+        console.log(postThumbnail);
+        tlFadeinPost.fromTo(".post-view article", 1.33,{backgroundColor: "rgba(255,255,255, 0)"}, {backgroundColor: "rgba(255,255,255, 1)"});
+    });     
+
+   
+
+    function onFadeinStart(event) {
+        TweenMax.set(".post-view article", {overflow: "auto"});
+        TweenMax.set("body", {className: "single"});
+    }
+
+    function onFadeinComplete(event) {
+
+    }    
+
 }]);
 
 app.factory("resourceCache",["$cacheFactory",
