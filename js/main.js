@@ -50,7 +50,7 @@ app.directive('onLastRepeat', function() {
 });
 
 app.run(function($templateCache, $http, resourceCache) {
-    $templateCache.put('indexview.html', '<div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{postitem.link}}" rel="bookmark"><img ng-src="{{postitem.featured_image.source}}" width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" alt="{{postitem.title}}" class="attachment-{{postitem.slug}}-thumbnail"><h1 class="entry-title">{{postitem.title}}</h1><span class="entry-details">{{postitem.acf.entry_details}}</span></a></div>');
+    $templateCache.put('indexview.html', '<div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{postitem.link}}" rel="bookmark" ng-click="onPostItemClick(postitem)"><img ng-src="{{postitem.featured_image.source}}" width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" alt="{{postitem.title}}" class="attachment-{{postitem.slug}}-thumbnail" ng-class="{selected : isSelected(postitem)}"><h1 class="entry-title">{{postitem.title}}</h1><span class="entry-details">{{postitem.acf.entry_details}}</span></a></div>');
     $templateCache.put('postview.html', '<article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><span class="entry-details">{{data.post.acf.entry_details}}</span><div class="featured-image"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}" alt="{{data.post.title}}"></div></header><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
     $http.get('wp-content/uploads/json/sitedata.json', {cache: resourceCache });
 });
@@ -656,6 +656,15 @@ app.controller('IndexController', ['$scope', 'promiseObj', '$state', '$timeout',
         }
     });
 
+    $scope.isSelected = function(postitem) {
+        return $scope.selected === postitem;
+    }    
+
+    $scope.onPostItemClick = function(postitem) {
+        $scope.selected = postitem;        
+        console.log(postitem);
+    }
+
     function onFadeoutStart(event) {
 
     }
@@ -684,7 +693,7 @@ app.controller('PostController', ['$scope', 'promiseObj', '$state', 'stateStatus
 
 
         // Tänk på att index inte alltid finns - därför kan den vara undefied
-
+        console.log("hola: " + stateStatusService.startState());
         var postOriginalThumbnail = ".attachment-" + "avstandets-bla" + "-thumbnail";
 
         var postThumbnail = {
@@ -697,7 +706,7 @@ app.controller('PostController', ['$scope', 'promiseObj', '$state', 'stateStatus
         }
 
         console.log(postThumbnail);
-        tlFadeinPost.fromTo(".post-view article", 1.33,{backgroundColor: "rgba(255,255,255, 0)"}, {backgroundColor: "rgba(255,255,255, 1)"});
+        tlFadeinPost.fromTo(".post-view article", 0.33,{backgroundColor: "rgba(255,255,255, 0)"}, {backgroundColor: "rgba(255,255,255, 1)"});
     });     
 
    

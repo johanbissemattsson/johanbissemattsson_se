@@ -1,3 +1,8 @@
+.selected {
+	border: 2px solid #000;
+	opacity: 0;
+}
+
 .site-content {
 	max-width: $maxwidth__site-main;
 	margin: 0 auto;
