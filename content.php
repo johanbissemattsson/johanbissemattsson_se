@@ -5,7 +5,7 @@
 ?>
 <div class="grid-item">
 
-			<a href="<?php the_permalink(); ?>" rel="bookmark" ng-click="onPostItemClick()">
+			<a href="<?php the_permalink(); ?>" rel="bookmark">
 				<?php if ( has_post_thumbnail() ) {
 					the_post_thumbnail(basename(get_permalink()) . '-thumbnail');
 				} ?>

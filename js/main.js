@@ -50,7 +50,7 @@ app.directive('onLastRepeat', function() {
 });
 
 app.run(function($templateCache, $http, resourceCache) {
-    $templateCache.put('indexview.html', '<div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{postitem.link}}" rel="bookmark" ng-click="onPostItemClick(postitem)"><img ng-src="{{postitem.featured_image.source}}" width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" alt="{{postitem.title}}" class="attachment-{{postitem.slug}}-thumbnail" ng-class="{selected : isSelected(postitem)}"><h1 class="entry-title">{{postitem.title}}</h1><span class="entry-details">{{postitem.acf.entry_details}}</span></a></div>');
+    $templateCache.put('indexview.html', '<div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-item" ng-repeat="postitem in data.posts"><a href="{{postitem.link}}" rel="bookmark" ng-click="onPostItemClick(postitem)" ng-class="{selected : isSelected(postitem)}"><img ng-src="{{postitem.featured_image.source}}" width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" alt="{{postitem.title}}" class="attachment-{{postitem.slug}}-thumbnail"><h1 class="entry-title">{{postitem.title}}</h1><span class="entry-details">{{postitem.acf.entry_details}}</span></a></div>');
     $templateCache.put('postview.html', '<article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><span class="entry-details">{{data.post.acf.entry_details}}</span><div class="featured-image"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}" alt="{{data.post.title}}"></div></header><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
     $http.get('wp-content/uploads/json/sitedata.json', {cache: resourceCache });
 });
@@ -455,31 +455,23 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
         url: '/',
         sticky: true,
         resolve: {
-            indexTemplateCacheOrInitialContent: function ($templateRequest, stateStatusService) {                
-                if(stateStatusService.dataFromJSON()) {
-                    console.log("get indexview.html (json)");                                                                    
-                    return $templateRequest('indexview.html');
-                } else {
-                    console.log("get initialcontent.html (php)");                                                                                        
-                    return $templateRequest('indexview-initialcontent.html');                    
-                }
+            indexTemplateCache: function ($templateRequest, stateStatusService) {                
+                return $templateRequest('indexview.html');
             },
             promiseObj: function ($stateParams, resourceCache, stateStatusService, wpService) {
-                if (stateStatusService.dataFromJSON()) {
+                if (!stateStatusService.indexInitialized()) {
+                    stateStatusService.dataFromJSON(true);                    
                     stateStatusService.indexInitialized(true);                                        
                     return wpService.getIndex();
                     return wpService;                                    
-                } else {
-                    stateStatusService.dataFromJSON(true);
-                    stateStatusService.indexInitialized(true);                    
-                } 
+                };
                 return;
             }         
         },
         views: {
             'indexView@': {
-                templateProvider: function(indexTemplateCacheOrInitialContent, stateStatusService) {
-                    return indexTemplateCacheOrInitialContent;
+                templateProvider: function(indexTemplateCache, stateStatusService) {
+                    return indexTemplateCache;
                 },
                 controller: 'IndexController'           
             },
@@ -662,7 +654,7 @@ app.controller('IndexController', ['$scope', 'promiseObj', '$state', '$timeout',
 
     $scope.onPostItemClick = function(postitem) {
         $scope.selected = postitem;        
-        console.log(postitem);
+        console.log("Postitem: " + postitem);
     }
 
     function onFadeoutStart(event) {
