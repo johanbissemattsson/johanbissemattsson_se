@@ -33,7 +33,7 @@ app.directive('postView', ['$templateCache', function($templateCache)
     };
 }])
 
-app.directive("preloadResource", ["resourceCache", 
+app.directive('preloadResource', ['resourceCache', 
     function(resourceCache) {
       return { link: function (scope, element, attrs) { 
         resourceCache.put(attrs.preloadResource, element.html()); 
@@ -48,10 +48,19 @@ app.directive('onLastRepeat', function() {
         }, 1);
     };
 });
+/*
+app.directive('animatedImage', function() {
+    return {
+        restrict: 'A',
+        template: '<div class="animated-image-container"><img src="" width="22" height="22"></div>'
+        }
+    }
+});
+*/
 
 app.run(function($templateCache, $http, resourceCache) {
-    $templateCache.put('indexview.html', '<div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-item" ng-repeat="postitem in data.posts"><a href="{{postitem.link}}" rel="bookmark" ng-click="onPostItemClick(postitem)" ng-class="{selected : isSelected(postitem)}"><img ng-src="{{postitem.featured_image.source}}" width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" alt="{{postitem.title}}" class="attachment-{{postitem.slug}}-thumbnail"><h1 class="entry-title">{{postitem.title}}</h1><span class="entry-details">{{postitem.acf.entry_details}}</span></a></div>');
-    $templateCache.put('postview.html', '<article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><span class="entry-details">{{data.post.acf.entry_details}}</span><div class="featured-image"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}" alt="{{data.post.title}}"></div></header><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
+    $templateCache.put('indexview.html', '<div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{postitem.link}}" rel="bookmark" ng-click="onPostItemClick(postitem)" ng-class="{selected : isSelected(postitem)}"><img ng-src="{{postitem.featured_image.source}}" width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" alt="{{postitem.title}}" class="attachment-{{postitem.slug}}-thumbnail"><h1 class="entry-title">{{postitem.title}}</h1> <span class="entry-details">{{postitem.acf.entry_details}}</span></a></div>');
+    $templateCache.put('postview.html', '<article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><span class="entry-details">{{data.post.acf.entry_details}}</span><div class="featured-image"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}" alt="{{data.post.title}}"></div><div class="animate-featured-image"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}"></div></header><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
     $http.get('wp-content/uploads/json/sitedata.json', {cache: resourceCache });
 });
 
@@ -62,6 +71,8 @@ app.controller('MainController', ['$scope', '$rootScope', '$state', '$location',
         if (!stateStatusService.startState()) {
             stateStatusService.startState(toState.name);
             console.log("Start state is: " + stateStatusService.startState());
+        } else {
+            console.log("Current state is: " + toState.name);
         }
     });
 
@@ -460,6 +471,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
             },
             promiseObj: function ($stateParams, resourceCache, stateStatusService, wpService) {
                 if (!stateStatusService.indexInitialized()) {
+                    console.log("index initialiseras!!!");
                     stateStatusService.dataFromJSON(true);                    
                     stateStatusService.indexInitialized(true);                                        
                     return wpService.getIndex();
@@ -495,7 +507,7 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
                     console.log("get postview.html (json)");                                                                    
                     return $templateRequest('postview.html');
                 } else {
-                    console.log("get initialcontent.html (php)");                                                                                        
+                    console.log("get postview-initialcontent.html (php)");                                                                                        
                     return $templateRequest('postview-initialcontent.html');                    
                 }
             },
@@ -504,7 +516,6 @@ app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $urlM
                     return wpService.getPost($stateParams.slug);
                     return wpService;
                 } else {
-                    console.log("initDataFromJSON (post state)");
                     stateStatusService.dataFromJSON(true);
                 } 
                 return;
@@ -643,7 +654,6 @@ app.controller('IndexController', ['$scope', 'promiseObj', '$state', '$timeout',
             tlFadeoutPost.set(".post-view article", {overflow: "hidden"});         
             tlFadeoutPost.set("body", {className: "index"}); 
             tlFadeoutPost.set(".post-view article", {backgroundColor: "rgba(255,255,255, 0)"});         
-
             tlFadeoutPost.to(".post-view article", 0.33, {autoAlpha: 0});
         }
     });
@@ -654,7 +664,21 @@ app.controller('IndexController', ['$scope', 'promiseObj', '$state', '$timeout',
 
     $scope.onPostItemClick = function(postitem) {
         $scope.selected = postitem;        
-        console.log("Postitem: " + postitem);
+        console.log(postitem);
+
+        var indexFeaturedImageElement = $(".attachment-" + postitem.slug + "-thumbnail");
+        //var indexFeaturedImageElement = $(".attachment-" + postitem.slug + "-thumbnail")[0].getBoundingClientRect();
+
+        var indexFeaturedImage = {
+            src: postitem.featured_image.source,
+            width: indexFeaturedImageElement.width(),
+            height: indexFeaturedImageElement.height(),
+            x: indexFeaturedImageElement.position().left,
+            y: indexFeaturedImageElement.position().top
+        };
+
+        stateStatusService.featuredImageData(indexFeaturedImage);
+        console.log(indexFeaturedImage);
     }
 
     function onFadeoutStart(event) {
@@ -673,32 +697,60 @@ app.controller('PostController', ['$scope', 'promiseObj', '$state', 'stateStatus
         $scope.data = promiseObj;       
     }
 
-    console.log($state.current);
-
-    if (stateStatusService.startState() == "post") {
-        console.log("hej");
-    }
-
     $scope.$on('$viewContentLoaded', function(event) {
         var tlFadeinPost = new TimelineMax({onStart: onFadeinStart, onComplete: onFadeinComplete});
-        tlFadeinPost.set(".featured-image, .entry-header, .entry-content", {autoAlpha: 0.25});
+        //tlFadeinPost.set(".featured-image, .entry-header, .entry-content", {autoAlpha: 0});
+        //tlFadeinPost.set(".featured-image", {autoAlpha: 0});
+
+        if (stateStatusService.featuredImageData()) {
+            var indexFeaturedImageData = stateStatusService.featuredImageData();
+            //console.log($(".animate-featured-image img").innerWidth());
+            //console.log($(".post-view .entry-header").position());
+            var postFeaturedImageContainer = $(".featured-image");            
+            var postFeaturedImageElement = $(".featured-image img");
+            var postFeaturedImageData = {
+                top: postFeaturedImageElement.position().top,
+                width: postFeaturedImageContainer.width()
+            };
+            element = $(".featured-image")[0];
+
+            var bodyRect = document.body.getBoundingClientRect(),
+            elemRect = element.getBoundingClientRect(),
+            temp   = elemRect.top;
+
+            //var temp = $(".featured-image").prop('offsetTop')-16;
+            //var temp = $(".featured-image-container").offset().top - $(".post-view").scrollTop;
+            //var temp = $(".entry-header").height() - $(".post-view article").scrollTop();
+            //var temp = $(".entry-header").parent().offset().top + $(".featured-image").offset().top;
+
+            tlFadeinPost.fromTo(".animate-featured-image", 0.5, {top: stateStatusService.featuredImageData().y, left: stateStatusService.featuredImageData().x, width: stateStatusService.featuredImageData().width}, {top: temp, left: elemRect.left});
 
 
-        // Tänk på att index inte alltid finns - därför kan den vara undefied
-        console.log("hola: " + stateStatusService.startState());
-        var postOriginalThumbnail = ".attachment-" + "avstandets-bla" + "-thumbnail";
+            console.log(temp);
+            //console.log($(".post-view").offset().top - $(".animate-featured-image").offset().top - $("document").scrollTop());
+            
 
-        var postThumbnail = {
-            src: $(postOriginalThumbnail).attr('src'),
-            x: 3,
-            y: 3,
-            width: 3,
-            height: 3,
 
+
+
+            //var hola = $(".post-view .entry-title").outerHeight(true) + $(".post-view .entry-details").outerHeight(true) + 25;
+            //console.log(hola);
+            //console.log($(".post-view .entry-details").position().top - $(".featured-image").position().top );
+            //console.log(postFeaturedImageContainer.offset().top + $(".post-view article").scrollTop() - $(window).scrollTop());
+            //var offset = postFeaturedImageElement.viewportOffset().relativeTo(postFeaturedImageContainer.viewportOffset());
+
+            //var hej = postFeaturedImageElement.offset().top - postFeaturedImageElement.parent().offset().top;
+
+
+            //console.log($(".featured-image img").offset().top);
+
+            //tlFadeinPost.from(".animate-featured-image", 1, { left: indexFeaturedImageData.x, y: indexFeaturedImageData.y, width: indexFeaturedImageData.width});
+            //remember to clean featured image data
         }
 
-        console.log(postThumbnail);
-        tlFadeinPost.fromTo(".post-view article", 0.33,{backgroundColor: "rgba(255,255,255, 0)"}, {backgroundColor: "rgba(255,255,255, 1)"});
+        //tlFadeinPost.to(".animate-featured-image", 1.5, {x: postThumbnail.x, y: postThumbnail.y, width: postThumbnail.width, ease: Elastic.easeOut});
+        tlFadeinPost.fromTo(".post-view article", 1,{backgroundColor: "rgba(255,255,255, 0)"}, {backgroundColor: "rgba(255,255,255, 1)"});
+
     });     
 
    
@@ -777,6 +829,7 @@ app.service('stateStatusService', function () {
     var boolStringInitialized = false;
     var varrenameThis = 0;
     var boolfadeOutPostView = false;
+    var arrayFeaturedImageData;
 
     return {
         startState: function (value) {
@@ -849,6 +902,14 @@ app.service('stateStatusService', function () {
                 return;
             } else {
                 return boolfadeOutPostView;
+            }
+        },
+        featuredImageData: function (array) {
+            if (array) {
+                arrayFeaturedImageData = array;
+                return;
+            } else {
+                return arrayFeaturedImageData;
             }
         }        
     }
