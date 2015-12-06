@@ -153,9 +153,11 @@
 
 
 			.featured-image {
-				opacity: 0;				
+				opacity: 0;
 
 				img {
+				position: relative;		
+
 					width: 100%;
 					height: auto;
 				}
@@ -169,6 +171,7 @@
 					width: 100%;
 					height: auto;
 					-webkit-filter: invert(25%);
+					pointer-events: none;
 
 				}
 			}				

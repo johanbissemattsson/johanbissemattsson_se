@@ -664,12 +664,9 @@ app.controller('IndexController', ['$scope', 'promiseObj', '$state', '$timeout',
 
     $scope.onPostItemClick = function(postitem) {
         $scope.selected = postitem;        
-        console.log(postitem);
 
         var indexFeaturedImageElement = $(".attachment-" + postitem.slug + "-thumbnail");
         //var indexFeaturedImageElement = $(".attachment-" + postitem.slug + "-thumbnail")[0].getBoundingClientRect();
-
-        console.log("HOLA: " + indexFeaturedImageElement.offset().top);
 
         var indexFeaturedImage = {
             src: postitem.featured_image.source,
@@ -680,9 +677,6 @@ app.controller('IndexController', ['$scope', 'promiseObj', '$state', '$timeout',
         };
 
         stateStatusService.featuredImageData(indexFeaturedImage);
-                console.log("här " + indexFeaturedImageElement.offset().left + " och här: " +  $(".site-description").offset().left);
-
-        console.log(indexFeaturedImage);
     }
 
     function onFadeoutStart(event) {
@@ -713,18 +707,35 @@ app.controller('PostController', ['$scope', 'promiseObj', '$state', 'stateStatus
             var postFeaturedImageData = {
 
                 width: "100%",
+                height: $(".featured-image img")[0].getBoundingClientRect().offset,
                 top: $(".featured-image").offset().top - $(".entry-cover").offset().top,
                 left: 0
             };
 
+            var windowHeight = $(window).height();
+            var entryHeaderHeight = $(".entry-header").height();
+            var imageHeight = indexFeaturedImageData.height * 2 + $(".entry-header").height() * 2;
+
+            if (imageHeight < windowHeight) { // && entry-width > screen.width
+                var heightDifference = ((windowHeight - imageHeight) / 2);
+                console.log("Add margin of: " + heightDifference);
+                //TweenMax.set(".entry-header", {marginTop: heightDifference});
+            }
+
+
+            console.log("Window height: " + windowHeight);
+            console.log("Entry-header height: " + entryHeaderHeight);
+            console.log("Image height: " + imageHeight);
+            console.log("Width: " + $(".site-description").width());
+
+
             tlFadeinPost.fromTo(".animate-featured-image", 0.5, {top: stateStatusService.featuredImageData().y - $(".entry-header").height(), left: indexFeaturedImageData.x - $(".site-description").offset().left, width: stateStatusService.featuredImageData().width}, {top: postFeaturedImageData.top, left: postFeaturedImageData.left, width: postFeaturedImageData.width, ease: Power2.easeOut});
-            console.log(postFeaturedImageData);
         }
 
         //tlFadeinPost.to(".animate-featured-image", 1.5, {x: postThumbnail.x, y: postThumbnail.y, width: postThumbnail.width, ease: Elastic.easeOut});
-        tlFadeinPost.fromTo(".post-view article", 0.5,{backgroundColor: "rgba(255,255,255, 0)"}, {backgroundColor: "rgba(255,255,255, 1)"}, "-=0.5");
-        tlFadeinPost.fromTo(".post-view .entry-header", 0.5,{autoAlpha: 0, y: "+=8"}, {autoAlpha: 1, y: "0", ease: Power2.easeOut}, "-=0.25");
-        tlFadeinPost.fromTo(".post-view .entry-content", 0.5,{autoAlpha: 0, y: "-=8"}, {autoAlpha: 1, y: "0", ease: Power2.easeOut}, "-=0.5");
+        tlFadeinPost.fromTo(".post-view article", 1,{backgroundColor: "rgba(255,255,255, 0)"}, {backgroundColor: "rgba(255,255,255, 1)"}, "-=0.5");
+        tlFadeinPost.fromTo(".post-view .entry-header", 1,{autoAlpha: 0, y: "+=8"}, {autoAlpha: 1, y: "0", ease: Power2.easeOut}, "-=1");
+        tlFadeinPost.fromTo(".post-view .entry-content", 1,{autoAlpha: 0, y: "-=8"}, {autoAlpha: 1, y: "0", ease: Power2.easeOut}, "-=1");
 
 
     });     
