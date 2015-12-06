@@ -57,10 +57,10 @@ app.directive('animatedImage', function() {
     }
 });
 */
-
+//<h1 class="entry-title">{{data.post.title}}</h1><p class="entry-details">{{data.post.acf.entry_details}}</p>
 app.run(function($templateCache, $http, resourceCache) {
     $templateCache.put('indexview.html', '<div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{postitem.link}}" rel="bookmark" ng-click="onPostItemClick(postitem)" ng-class="{selected : isSelected(postitem)}"><img ng-src="{{postitem.featured_image.source}}" width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" alt="{{postitem.title}}" class="attachment-{{postitem.slug}}-thumbnail"><h1 class="entry-title">{{postitem.title}}</h1> <span class="entry-details">{{postitem.acf.entry_details}}</span></a></div>');
-    $templateCache.put('postview.html', '<article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><span class="entry-details">{{data.post.acf.entry_details}}</span><div class="featured-image"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}" alt="{{data.post.title}}"></div><div class="animate-featured-image"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}"></div></header><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
+    $templateCache.put('postview.html', '<article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><p class="entry-details">{{data.post.acf.entry_details}}</p><div class="featured-image-container"><div class="featured-image"><div class="hej"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}" alt="{{data.post.title}}"></div></div><div class="animate-featured-image"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}"></div></div></header><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
     $http.get('wp-content/uploads/json/sitedata.json', {cache: resourceCache });
 });
 
@@ -704,48 +704,16 @@ app.controller('PostController', ['$scope', 'promiseObj', '$state', 'stateStatus
 
         if (stateStatusService.featuredImageData()) {
             var indexFeaturedImageData = stateStatusService.featuredImageData();
-            //console.log($(".animate-featured-image img").innerWidth());
-            //console.log($(".post-view .entry-header").position());
-            var postFeaturedImageContainer = $(".featured-image");            
+            var postFeaturedImageContainer = $(".featured-image");
             var postFeaturedImageElement = $(".featured-image img");
             var postFeaturedImageData = {
-                top: postFeaturedImageElement.position().top,
-                width: postFeaturedImageContainer.width()
+                top: $(".featured-image").offset().top - $(".featured-image-container").offset().top,
+                width: 1080, // $(".site-content").innerWidth(),
+                left: $(".featured-image").offset().left
             };
-            element = $(".featured-image")[0];
 
-            var bodyRect = document.body.getBoundingClientRect(),
-            elemRect = element.getBoundingClientRect(),
-            temp   = elemRect.top;
-
-            //var temp = $(".featured-image").prop('offsetTop')-16;
-            //var temp = $(".featured-image-container").offset().top - $(".post-view").scrollTop;
-            //var temp = $(".entry-header").height() - $(".post-view article").scrollTop();
-            //var temp = $(".entry-header").parent().offset().top + $(".featured-image").offset().top;
-
-            tlFadeinPost.fromTo(".animate-featured-image", 0.5, {top: stateStatusService.featuredImageData().y, left: stateStatusService.featuredImageData().x, width: stateStatusService.featuredImageData().width}, {top: temp, left: elemRect.left});
-
-
-            console.log(temp);
-            //console.log($(".post-view").offset().top - $(".animate-featured-image").offset().top - $("document").scrollTop());
-            
-
-
-
-
-            //var hola = $(".post-view .entry-title").outerHeight(true) + $(".post-view .entry-details").outerHeight(true) + 25;
-            //console.log(hola);
-            //console.log($(".post-view .entry-details").position().top - $(".featured-image").position().top );
-            //console.log(postFeaturedImageContainer.offset().top + $(".post-view article").scrollTop() - $(window).scrollTop());
-            //var offset = postFeaturedImageElement.viewportOffset().relativeTo(postFeaturedImageContainer.viewportOffset());
-
-            //var hej = postFeaturedImageElement.offset().top - postFeaturedImageElement.parent().offset().top;
-
-
-            //console.log($(".featured-image img").offset().top);
-
-            //tlFadeinPost.from(".animate-featured-image", 1, { left: indexFeaturedImageData.x, y: indexFeaturedImageData.y, width: indexFeaturedImageData.width});
-            //remember to clean featured image data
+            tlFadeinPost.fromTo(".animate-featured-image", 0.5, {top: stateStatusService.featuredImageData().y, left: stateStatusService.featuredImageData().x, width: stateStatusService.featuredImageData().width}, {top: postFeaturedImageData.top, left: postFeaturedImageData.left, width: postFeaturedImageData.width, ease: Expo.easeOut});
+            console.log(postFeaturedImageData);
         }
 
         //tlFadeinPost.to(".animate-featured-image", 1.5, {x: postThumbnail.x, y: postThumbnail.y, width: postThumbnail.width, ease: Elastic.easeOut});

@@ -129,41 +129,50 @@
 
 .post {
 
-	.animate-featured-image {
-		position: absolute;
-		top: 0;
-		left: 0;
-		pointer-events: none;
-
-		img {
-			display: block;
-			width: 100%;
-			height: auto;
-		}
-	}
 
 	.entry-header {
+		width: 100%;
+		max-width: 1080px;
+		margin: 0 auto;
 
-		.featured-image {
-			max-width: 1024px;
-			margin: 0 auto;
+		h1 {
+			font-size: 1em;
+		}
+
+		.entry-details {
+			font-size: 0.875em;
+		}
+
+		.featured-image-container {
+			position: relative;
 
 			.featured-image {
-				top: 0;
-				left: 0;
-				position: relative;
+				opacity: 0.2;				
+
+				img {
+					width: 100%;
+					height: auto;
+					//max-width: 1024px;
+
+
+				}
+
 			}
 
-			img {
-				width: 100%;
-				height: auto;
-			}
+			.animate-featured-image {
+				position: absolute;
+
+				img {
+					width: 100%;
+					height: auto;
+					display: block;
+
+					//max-width: 1024px;
+				}
+			}				
+
 		}
 
-		img {
-			width: 100%;
-			height: auto;
-		}
 	}
 }
 /*
