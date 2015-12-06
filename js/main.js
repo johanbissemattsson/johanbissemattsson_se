@@ -60,7 +60,7 @@ app.directive('animatedImage', function() {
 //<h1 class="entry-title">{{data.post.title}}</h1><p class="entry-details">{{data.post.acf.entry_details}}</p>
 app.run(function($templateCache, $http, resourceCache) {
     $templateCache.put('indexview.html', '<div class="site-description" ng-bind-html="data.home.content"></div><div class="grid"><div class="grid-item" ng-repeat="postitem in data.posts" on-last-repeat><a href="{{postitem.link}}" rel="bookmark" ng-click="onPostItemClick(postitem)" ng-class="{selected : isSelected(postitem)}"><img ng-src="{{postitem.featured_image.source}}" width="{{postitem.featured_image.attachment_meta.width}}" height="{{postitem.featured_image.attachment_meta.height}}" alt="{{postitem.title}}" class="attachment-{{postitem.slug}}-thumbnail"><h1 class="entry-title">{{postitem.title}}</h1> <span class="entry-details">{{postitem.acf.entry_details}}</span></a></div>');
-    $templateCache.put('postview.html', '<article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><p class="entry-details">{{data.post.acf.entry_details}}</p><div class="featured-image-container"><div class="featured-image"><div class="hej"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}" alt="{{data.post.title}}"></div></div><div class="animate-featured-image"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}"></div></div></header><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
+    $templateCache.put('postview.html', '<article id="post-{{data.post.ID}}" class="post-{{data.post.ID}} {{data.post.type}} type-{{data.post.type}}"><header class="entry-header"><h1 class="entry-title">{{data.post.title}}</h1><p class="entry-details">{{data.post.acf.entry_details}}</p></header><div class="entry-cover"><div class="featured-image"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}" alt="{{data.post.title}}"></div><div class="animate-featured-image"><img ng-src="{{data.post.featured_image.source}}" width="{{data.post.featured_image.attachment_meta.width}}" height="{{data.post.featured_image.attachment_meta.height}}"></div></div><div class="entry-content" ng-bind-html="data.post.content"></div></article>');
     $http.get('wp-content/uploads/json/sitedata.json', {cache: resourceCache });
 });
 
@@ -669,15 +669,19 @@ app.controller('IndexController', ['$scope', 'promiseObj', '$state', '$timeout',
         var indexFeaturedImageElement = $(".attachment-" + postitem.slug + "-thumbnail");
         //var indexFeaturedImageElement = $(".attachment-" + postitem.slug + "-thumbnail")[0].getBoundingClientRect();
 
+        console.log("HOLA: " + indexFeaturedImageElement.offset().top);
+
         var indexFeaturedImage = {
             src: postitem.featured_image.source,
             width: indexFeaturedImageElement.width(),
             height: indexFeaturedImageElement.height(),
-            x: indexFeaturedImageElement.position().left,
-            y: indexFeaturedImageElement.position().top
+            x: indexFeaturedImageElement.offset().left  - $(document).scrollLeft(),
+            y: indexFeaturedImageElement.offset().top - $(document).scrollTop()
         };
 
         stateStatusService.featuredImageData(indexFeaturedImage);
+                console.log("här " + indexFeaturedImageElement.offset().left + " och här: " +  $(".site-description").offset().left);
+
         console.log(indexFeaturedImage);
     }
 
@@ -707,17 +711,21 @@ app.controller('PostController', ['$scope', 'promiseObj', '$state', 'stateStatus
             var postFeaturedImageContainer = $(".featured-image");
             var postFeaturedImageElement = $(".featured-image img");
             var postFeaturedImageData = {
-                top: $(".featured-image").offset().top - $(".featured-image-container").offset().top,
-                width: 1080, // $(".site-content").innerWidth(),
-                left: $(".featured-image").offset().left
+
+                width: "100%",
+                top: $(".featured-image").offset().top - $(".entry-cover").offset().top,
+                left: 0
             };
 
-            tlFadeinPost.fromTo(".animate-featured-image", 0.5, {top: stateStatusService.featuredImageData().y, left: stateStatusService.featuredImageData().x, width: stateStatusService.featuredImageData().width}, {top: postFeaturedImageData.top, left: postFeaturedImageData.left, width: postFeaturedImageData.width, ease: Expo.easeOut});
+            tlFadeinPost.fromTo(".animate-featured-image", 0.5, {top: stateStatusService.featuredImageData().y - $(".entry-header").height(), left: indexFeaturedImageData.x - $(".site-description").offset().left, width: stateStatusService.featuredImageData().width}, {top: postFeaturedImageData.top, left: postFeaturedImageData.left, width: postFeaturedImageData.width, ease: Power2.easeOut});
             console.log(postFeaturedImageData);
         }
 
         //tlFadeinPost.to(".animate-featured-image", 1.5, {x: postThumbnail.x, y: postThumbnail.y, width: postThumbnail.width, ease: Elastic.easeOut});
-        tlFadeinPost.fromTo(".post-view article", 1,{backgroundColor: "rgba(255,255,255, 0)"}, {backgroundColor: "rgba(255,255,255, 1)"});
+        tlFadeinPost.fromTo(".post-view article", 0.5,{backgroundColor: "rgba(255,255,255, 0)"}, {backgroundColor: "rgba(255,255,255, 1)"}, "-=0.5");
+        tlFadeinPost.fromTo(".post-view .entry-header", 0.5,{autoAlpha: 0, y: "+=8"}, {autoAlpha: 1, y: "0", ease: Power2.easeOut}, "-=0.25");
+        tlFadeinPost.fromTo(".post-view .entry-content", 0.5,{autoAlpha: 0, y: "-=8"}, {autoAlpha: 1, y: "0", ease: Power2.easeOut}, "-=0.5");
+
 
     });     
 
